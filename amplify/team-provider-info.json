@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lpu-staging-71012-authRole",
+      "UnauthRoleArn": "arn:aws:iam::452293247502:role/amplify-lpu-staging-71012-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::452293247502:role/amplify-lpu-staging-71012-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-lpu-staging-71012-deployment",
+      "UnauthRoleName": "amplify-lpu-staging-71012-unauthRole",
+      "StackName": "amplify-lpu-staging-71012",
+      "StackId": "arn:aws:cloudformation:ap-south-1:452293247502:stack/amplify-lpu-staging-71012/f63ef2d0-2444-11ed-ab32-062d34b6e6ac",
+      "AmplifyAppId": "d1vwbc1vripvgi"
+    },
+    "categories": {
+      "auth": {
+        "LPU": {}
+      }
+    }
+  }
+}
