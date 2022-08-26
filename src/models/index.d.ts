@@ -11,7 +11,10 @@ type UserMetaData = {
 export declare class User {
   readonly id: string;
   readonly name: string;
-  readonly email: string;
+  readonly age: number;
+  readonly bio: string;
+  readonly gender: string;
+  readonly sub: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   constructor(init: ModelInit<User, UserMetaData>);

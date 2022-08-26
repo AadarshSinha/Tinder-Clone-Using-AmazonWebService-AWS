@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import {Text,View,StyleSheet,Pressable} from 'react-native';
 import DisplayScreen from './DisplayScreen'
 import MatchScreen from './MatchScreen'
@@ -7,12 +7,29 @@ import ProfileScreen from './ProfileScreen'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {Auth, DataStore, Storage} from 'aws-amplify';
+import {User} from './models/';
 
 const HomeScreen = () => {
-  const [screen,setScreen]=useState("display");
+  const [screen,setScreen]=useState("profile");
+  const [users,setUsers]=useState(null)
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
 
+  useEffect(()=>{
+    
+     const getUsers = async () => {
+      const authUser = await Auth.currentAuthenticatedUser();
+      const checkUser=await DataStore.query(User,u=>
+        u.sub('eq',authUser.attributes.sub),);
+        setUsers(checkUser);
+      };
+      getUsers();
+      if (!users || users.length === 0) {
+        console.log('This is a new user');
+        setScreen("profile");
+      } 
+      },[]);
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
@@ -29,14 +46,16 @@ const HomeScreen = () => {
            <MaterialCommunityIcons name="account" size={35} color={screen==="profile"?activeColor:defaultColor} />
         </Pressable>
       </View>
-      <View style={styles.bottomNavigation}>
-        <AntDesign name="heart" size={40} color="#4FCC94" style={styles.button}/>
-        <Entypo name="cross" size={40} color="#A65CD2" style={styles.button}/>
-      </View>
+      {
+        screen==="display" && <View style={styles.bottomNavigation}>
+          <AntDesign name="heart" size={40} color="#4FCC94" style={styles.button}/>
+          <Entypo name="cross" size={40} color="#A65CD2" style={styles.button}/>
+        </View>
+      }
       {screen==="display" && <DisplayScreen/>}
       {screen==="match" && <MatchScreen/>}
       {screen==="chat" && <ChatScreen/>}
-      {screen==="profile" && <ProfileScreen/>}
+      {screen==="profile" && <ProfileScreen users={users}/>}
     </View>
   );
 };
