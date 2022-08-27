@@ -11,25 +11,12 @@ import {Auth, DataStore, Storage} from 'aws-amplify';
 import {User} from './models/';
 
 const HomeScreen = () => {
-  const [screen,setScreen]=useState("profile");
-  const [users,setUsers]=useState(null)
+  const [screen,setScreen]=useState("display");
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
+  
 
-  useEffect(()=>{
-    
-     const getUsers = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const checkUser=await DataStore.query(User,u=>
-        u.sub('eq',authUser.attributes.sub),);
-        setUsers(checkUser);
-      };
-      getUsers();
-      if (!users || users.length === 0) {
-        console.log('This is a new user');
-        setScreen("profile");
-      } 
-      },[]);
+  
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
@@ -55,7 +42,7 @@ const HomeScreen = () => {
       {screen==="display" && <DisplayScreen/>}
       {screen==="match" && <MatchScreen/>}
       {screen==="chat" && <ChatScreen/>}
-      {screen==="profile" && <ProfileScreen users={users}/>}
+      {screen==="profile" && <ProfileScreen />}
     </View>
   );
 };

@@ -20,7 +20,7 @@ export const schema = {
                 "age": {
                     "name": "age",
                     "isArray": false,
-                    "type": "Int",
+                    "type": "String",
                     "isRequired": true,
                     "attributes": []
                 },
@@ -40,6 +40,13 @@ export const schema = {
                 },
                 "sub": {
                     "name": "sub",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "image": {
+                    "name": "image",
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
@@ -90,5 +97,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "bf38937b34d8875a00cad188eaf4936a"
+    "version": "b8332ba61acf9ff039f2685889f509b2"
 };

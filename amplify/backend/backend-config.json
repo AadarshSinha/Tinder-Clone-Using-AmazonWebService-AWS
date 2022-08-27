@@ -47,5 +47,12 @@
         }
       }
     }
+  },
+  "storage": {
+    "s3535dc26c": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
+    }
   }
 }
