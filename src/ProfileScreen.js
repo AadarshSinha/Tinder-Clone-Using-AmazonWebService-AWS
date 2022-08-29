@@ -8,6 +8,8 @@ import {
   Image,
   Pressable,
   ScrollView,
+  TouchableOpacity,
+  TouchableNativeFeedback,
 } from 'react-native';
 import {Auth, DataStore, Storage} from 'aws-amplify';
 import {User} from './models/';
@@ -32,7 +34,6 @@ const ProfileScreen = ({users}) => {
       const dbUsers = await DataStore.query(User, u =>
         u.sub('eq', authUser.attributes.sub),
       );
-      console.log(dbUsers);
       if (!dbUsers || dbUsers.length === 0) {
         console.log('This is a new user');
         return;
@@ -44,7 +45,6 @@ const ProfileScreen = ({users}) => {
       setGender(dbUser.gender);
       setAge(dbUser.age);
       setUri(dbUser.image);
-      console.log('Users = ' + user);
     };
     getCurrentUser();
   }, []);
@@ -83,7 +83,8 @@ const ProfileScreen = ({users}) => {
     console.log('clicked submit');
     console.log('Current User');
     console.log(user);
-    let newImage = await uploadImage();
+    let newImage;
+    if(isPick)newImage = await uploadImage();
     console.log('newImage = ' + newImage);
     if (!user) {
       console.log('Adding new user data');
@@ -107,7 +108,7 @@ const ProfileScreen = ({users}) => {
       updated.bio = Bio;
       updated.gender = Gender;
       updated.age = Age;
-      updated.image = newImage;
+      if(isPick)updated.image = newImage;
     });
     await DataStore.save(updatedUser);
 
@@ -127,15 +128,12 @@ const ProfileScreen = ({users}) => {
         }
         setUri(assets[0].uri);
         setIsPick(true);
-        console.log(Uri);
+        console.log("picked image = "+Uri);
       },
     );
   };
   const showImage = () => {
-    console.log(Uri);
-    console.log(isPick);
     if (Uri === '') {
-      console.log('Default profile');
       return <FontAwesome name="user" size={130} color="grey" />;
     }
     if (isPick) {
@@ -144,6 +142,7 @@ const ProfileScreen = ({users}) => {
 
     return <S3Image imgKey={Uri} style={styles.s3image} />;
   };
+
   return (
     <ScrollView style={styles.ProfileContainer}>
       <View alignItems='center'>
@@ -176,10 +175,12 @@ const ProfileScreen = ({users}) => {
           numberOfLines={3}
         />
         <View style={styles.profileFooter}>
-          <Pressable style={styles.button} onPress={Submit}>
-            <Text style={styles.text}>Submit</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={logOut}>
+          <TouchableOpacity>
+              <Pressable style={styles.button} onPress={Submit}>
+                <Text style={styles.text}>Submit</Text>
+              </Pressable>
+          </TouchableOpacity>
+          <Pressable style={styles.button} onPress={logOut} >
             <Text style={styles.text}>Log Out</Text>
           </Pressable>
         </View>
@@ -193,7 +194,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: '100%',
     height: '100%',
-    // alignItems: 'center',
   },
   profileFooter: {
     flexDirection: 'row',
@@ -201,8 +201,6 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 30,
     marginBottom:30,
-    // top: '80%',
-    // position: 'absolute',
   },
   s3image: {
     width: 200,

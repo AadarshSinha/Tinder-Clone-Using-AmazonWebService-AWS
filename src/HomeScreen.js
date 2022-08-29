@@ -12,11 +12,25 @@ import {User} from './models/';
 
 const HomeScreen = () => {
   const [screen,setScreen]=useState("display");
+  const [user,setUser]=useState(null);
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
   
 
-  
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const authUser = await Auth.currentAuthenticatedUser();
+      const dbUsers = await DataStore.query(User, u =>
+        u.sub('eq', authUser.attributes.sub),
+        );
+        if (!dbUsers || dbUsers.length === 0) {
+          setScreen("profile")
+          return;
+      }
+      setUser(dbUsers[0]);
+    };
+    getCurrentUser();
+  }, []);
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
@@ -33,14 +47,9 @@ const HomeScreen = () => {
            <MaterialCommunityIcons name="account" size={35} color={screen==="profile"?activeColor:defaultColor} />
         </Pressable>
       </View>
-      {
-        screen==="display" && <View style={styles.bottomNavigation}>
-          <AntDesign name="heart" size={40} color="#4FCC94" style={styles.button}/>
-          <Entypo name="cross" size={40} color="#A65CD2" style={styles.button}/>
-        </View>
-      }
+      
       {screen==="display" && <DisplayScreen/>}
-      {screen==="match" && <MatchScreen/>}
+      {screen==="match" && <MatchScreen sub={user.sub}/>}
       {screen==="chat" && <ChatScreen/>}
       {screen==="profile" && <ProfileScreen />}
     </View>
@@ -56,26 +65,11 @@ const styles=StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
+        height:80,
         padding: 20,
         backgroundColor:"white"
     },
-    bottomNavigation: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%',
-        padding: 10,
-        position: 'absolute',
-        bottom: 30,
-    },
-    button: {
-        width: 60,
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 50,
-      },
+    
 });
 
 export default HomeScreen;
