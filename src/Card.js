@@ -5,10 +5,13 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 
 export default function Card({ user}) {
+  const diasplayImage = () => {
+    return <Image source={{uri: `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${user.image}`}} style={styles.photo} />; 
+  } 
   return (
+    
     <View style={styles.CardContainer}>
-      
-      <S3Image imgKey={ user.image } style={styles.photo} />
+       {diasplayImage()}
       <View style={styles.textContainer}>
         <View style={styles.textRow}>
           <Text style={[styles.textPrimary, styles.textShadow]}>{user.name}</Text>

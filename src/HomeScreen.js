@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {Text,View,StyleSheet,Pressable} from 'react-native';
+import {Text,View,StyleSheet,Pressable,ActivityIndicator} from 'react-native';
 import DisplayScreen from './DisplayScreen'
 import MatchScreen from './MatchScreen'
 import ChatScreen from './ChatScreen'
@@ -7,30 +7,15 @@ import ProfileScreen from './ProfileScreen'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {Auth, DataStore, Storage} from 'aws-amplify';
+import {Auth, DataStore,Hub, Storage} from 'aws-amplify';
 import {User} from './models/';
 
 const HomeScreen = () => {
-  const [screen,setScreen]=useState("display");
-  const [user,setUser]=useState(null);
+  const [screen,setScreen]=useState("profile");
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
-  
 
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const dbUsers = await DataStore.query(User, u =>
-        u.sub('eq', authUser.attributes.sub),
-        );
-        if (!dbUsers || dbUsers.length === 0) {
-          setScreen("profile")
-          return;
-      }
-      setUser(dbUsers[0]);
-    };
-    getCurrentUser();
-  }, []);
+
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
@@ -49,9 +34,9 @@ const HomeScreen = () => {
       </View>
       
       {screen==="display" && <DisplayScreen/>}
-      {screen==="match" && <MatchScreen sub={user.sub}/>}
+      {screen==="match"  && <MatchScreen />}
       {screen==="chat" && <ChatScreen/>}
-      {screen==="profile" && <ProfileScreen />}
+      {screen==="profile" &&  <ProfileScreen />}
     </View>
   );
 };

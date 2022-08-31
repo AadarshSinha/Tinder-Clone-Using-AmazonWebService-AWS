@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {S3Image} from 'aws-amplify-react-native';
 
-const ProfileScreen = ({users}) => {
+const ProfileScreen = () => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');
   const [Bio, setBio] = useState('');
@@ -31,14 +31,17 @@ const ProfileScreen = ({users}) => {
     const getCurrentUser = async () => {
       const authUser = await Auth.currentAuthenticatedUser();
 
+      console.log('sub = ', authUser.attributes.sub);
       const dbUsers = await DataStore.query(User, u =>
         u.sub('eq', authUser.attributes.sub),
       );
+      console.log('dbusers ', dbUsers);
       if (!dbUsers || dbUsers.length === 0) {
         console.log('This is a new user');
         return;
       }
       const dbUser = dbUsers[0];
+      console.log('dbuser ', dbUser);
       setUser(dbUser);
       setName(dbUser.name);
       setBio(dbUser.bio);
@@ -48,6 +51,12 @@ const ProfileScreen = ({users}) => {
     };
     getCurrentUser();
   }, []);
+  // useEffect(() => {
+  //   console.log('hello 1');
+  //   if (user === null) return;
+  //   console.log('hello 2');
+  //   setLoading(true);
+  // }, [user]);
   const check = () => {
     if (Name === '') return false;
     if (Age === '') return false;
@@ -76,15 +85,18 @@ const ProfileScreen = ({users}) => {
     }
   };
   const Submit = async () => {
+    console.log('clicked submit');
     if (!check()) {
       console.log('Enter all details');
       return;
     }
-    console.log('clicked submit');
     console.log('Current User');
     console.log(user);
     let newImage;
-    if(isPick)newImage = await uploadImage();
+    if (isPick) {
+      newImage = await uploadImage();
+      // DataStore.clear()
+    }
     console.log('newImage = ' + newImage);
     if (!user) {
       console.log('Adding new user data');
@@ -108,13 +120,14 @@ const ProfileScreen = ({users}) => {
       updated.bio = Bio;
       updated.gender = Gender;
       updated.age = Age;
-      if(isPick)updated.image = newImage;
+      if (isPick) updated.image = newImage;
     });
     await DataStore.save(updatedUser);
 
     console.log('updated user to db');
   };
   const logOut = async () => {
+    await DataStore.clear();
     Auth.signOut();
   };
   const AddImage = () => {
@@ -128,7 +141,7 @@ const ProfileScreen = ({users}) => {
         }
         setUri(assets[0].uri);
         setIsPick(true);
-        console.log("picked image = "+Uri);
+        console.log('picked image = ' + Uri);
       },
     );
   };
@@ -139,52 +152,54 @@ const ProfileScreen = ({users}) => {
     if (isPick) {
       return <Image source={{uri: Uri}} style={styles.s3image} />;
     }
+    const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${Uri}`;
+    console.log('url = ' + url);
+    return <Image source={{uri: url}} style={styles.s3image} />;
 
-    return <S3Image imgKey={Uri} style={styles.s3image} />;
   };
 
   return (
     <ScrollView style={styles.ProfileContainer}>
-      <View alignItems='center'>
-        <Text style={styles.textt}>Profile Photo</Text>
-        {showImage()}
-        <Pressable onPress={AddImage}>
-          <Ionicons name="add-circle" size={35} color="#F76C6B" />
-        </Pressable>
-        <Text style={styles.textt}>Name</Text>
-        <TextInput style={styles.name} value={Name} onChangeText={setName} />
-        <Text style={styles.textt}>Age</Text>
-        <TextInput
-          style={styles.age}
-          value={Age}
-          onChangeText={setAge}
-          keyboardType="numeric"
-        />
-        <Text style={styles.textt}>Gender</Text>
-        <TextInput
-          style={styles.gender}
-          value={Gender}
-          onChangeText={setGender}
-        />
-        <Text style={styles.textt}>Bio</Text>
-        <TextInput
-          style={styles.bio}
-          value={Bio}
-          onChangeText={setBio}
-          multiline
-          numberOfLines={3}
-        />
-        <View style={styles.profileFooter}>
-          <TouchableOpacity>
+        <View alignItems="center">
+          <Text style={styles.textt}>Profile Photo</Text>
+          {showImage()}
+          <Pressable onPress={AddImage}>
+            <Ionicons name="add-circle" size={35} color="#F76C6B" />
+          </Pressable>
+          <Text style={styles.textt}>Name</Text>
+          <TextInput style={styles.name} value={Name} onChangeText={setName} />
+          <Text style={styles.textt}>Age</Text>
+          <TextInput
+            style={styles.age}
+            value={Age}
+            onChangeText={setAge}
+            keyboardType="numeric"
+          />
+          <Text style={styles.textt}>Gender</Text>
+          <TextInput
+            style={styles.gender}
+            value={Gender}
+            onChangeText={setGender}
+          />
+          <Text style={styles.textt}>Bio</Text>
+          <TextInput
+            style={styles.bio}
+            value={Bio}
+            onChangeText={setBio}
+            multiline
+            numberOfLines={3}
+          />
+          <View style={styles.profileFooter}>
+            <TouchableOpacity>
               <Pressable style={styles.button} onPress={Submit}>
                 <Text style={styles.text}>Submit</Text>
               </Pressable>
-          </TouchableOpacity>
-          <Pressable style={styles.button} onPress={logOut} >
-            <Text style={styles.text}>Log Out</Text>
-          </Pressable>
+            </TouchableOpacity>
+            <Pressable style={styles.button} onPress={logOut}>
+              <Text style={styles.text}>Log Out</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
     </ScrollView>
   );
 };
@@ -200,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 30,
-    marginBottom:30,
+    marginBottom: 30,
   },
   s3image: {
     width: 200,
