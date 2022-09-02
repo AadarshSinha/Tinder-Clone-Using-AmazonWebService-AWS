@@ -15,7 +15,6 @@ import awsconfig from './src/aws-exports';
 import {withAuthenticator} from 'aws-amplify-react-native';
 import HomeScreen from './src/HomeScreen';
 import LoginPage from './src/LoginPage';
-import Navigation from './src/Navigation';
 
 Amplify.configure({
   ...awsconfig,
@@ -41,7 +40,7 @@ const App = () => {
   }, []);
   useEffect(() => {
     const listener = data => {
-      if (data.payload.event === 'signIn' || data.payload.event === 'signOut') {
+      if (data.payload.event === 'signIn' || data.payload.event === 'signOut'){
         checkUser();
       }
     };
@@ -57,7 +56,7 @@ const App = () => {
   }
   return (
     <SafeAreaView style={style.home}>
-      {(curUser || !loading) ? (
+      {curUser ? (
         <HomeScreen />
       ) : (
         <LoginPage setLoading={setLoading} />

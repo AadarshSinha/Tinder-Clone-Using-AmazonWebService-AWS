@@ -19,7 +19,7 @@ const LoginPage = ({setLoading}) => {
     try {
       const response = await Auth.signIn(number, password);
       console.log(response);
-      setLoading(false);
+      // setLoading(false);
     } catch (e) {
       Alert.alert('Ops..', e.message);
     }
@@ -94,7 +94,7 @@ const LoginPage = ({setLoading}) => {
             style={styles.textInput}
             value={number}
             onChangeText={setNumber}
-            placeholder="Enter Phone Number"
+            placeholder="Enter Email Id"
             placeholderTextColor="grey"
           />
           <TextInput
@@ -129,7 +129,7 @@ const LoginPage = ({setLoading}) => {
             style={styles.textInput}
             value={number}
             onChangeText={setNumber}
-            placeholder="Enter Phone Number"
+            placeholder="Enter Email Id"
             placeholderTextColor="grey"
           />
           <TextInput
@@ -157,7 +157,7 @@ const LoginPage = ({setLoading}) => {
             style={styles.textInput}
             value={number}
             onChangeText={setNumber}
-            placeholder="Enter Phone Number"
+            placeholder="Enter Email Id"
             placeholderTextColor="grey"
           />
           <TextInput
@@ -191,9 +191,9 @@ const LoginPage = ({setLoading}) => {
           <TouchableOpacity style={styles.button} onPress={Verify}>
             <Text style={styles.text}>Verify</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={resendOTP}>
+          {screen==='verifyNew'&&<TouchableOpacity style={styles.button} onPress={resendOTP}>
             <Text style={styles.text}>Resend</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </>
       )}
     </View>
@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
     marginTop: 10,
     paddingHorizontal: 20,
+    elevation: 10,
   },
   text: {
     fontSize: 16,

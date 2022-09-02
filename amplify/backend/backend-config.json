@@ -12,7 +12,7 @@
         ],
         "signupAttributes": [],
         "passwordProtectionSettings": {
-          "passwordPolicyMinLength": 6,
+          "passwordPolicyMinLength": 7,
           "passwordPolicyCharacters": []
         },
         "mfaConfiguration": "OFF",
