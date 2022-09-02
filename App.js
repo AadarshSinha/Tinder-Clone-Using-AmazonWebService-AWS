@@ -7,12 +7,16 @@ import {
   ActivityIndicator,
   setInterval,
   clearInterval,
+  View,
 } from 'react-native';
-import {Amplify, Hub,Auth, DataStore} from 'aws-amplify';
+
+import {Amplify, Hub, Auth, DataStore} from 'aws-amplify';
 import awsconfig from './src/aws-exports';
 import {withAuthenticator} from 'aws-amplify-react-native';
 import HomeScreen from './src/HomeScreen';
-import Loading from './src/Loading';
+import LoginPage from './src/LoginPage';
+import Navigation from './src/Navigation';
+
 Amplify.configure({
   ...awsconfig,
   Analytics: {
@@ -20,12 +24,44 @@ Amplify.configure({
   },
 });
 const App = () => {
-  const [isUserLoading, setIsUserLoading] = useState(true);
-
-
+  const [loading, setLoading] = useState(true);
+  const [curUser, setCurUser] = useState(undefined);
+  const checkUser = async () => {
+    try {
+      const authUser = await Auth.currentAuthenticatedUser({
+        bypassCache: false,
+      });
+      setCurUser(authUser);
+    } catch (e) {
+      setCurUser(null);
+    }
+  };
+  useEffect(() => {
+    checkUser();
+  }, []);
+  useEffect(() => {
+    const listener = data => {
+      if (data.payload.event === 'signIn' || data.payload.event === 'signOut') {
+        checkUser();
+      }
+    };
+    Hub.listen('auth', listener);
+    return () => Hub.remove('auth', listener);
+  }, []);
+  if (curUser === undefined) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={style.home}>
-      {!isUserLoading ? <Loading /> : <HomeScreen />}
+      {(curUser || !loading) ? (
+        <HomeScreen />
+      ) : (
+        <LoginPage setLoading={setLoading} />
+      )}
     </SafeAreaView>
   );
 };
@@ -33,70 +69,8 @@ const style = StyleSheet.create({
   home: {
     width: '100%',
     height: '100%',
-    // backgroundColor: '#b5b5b5',
     backgroundColor: 'white',
   },
 });
-export default withAuthenticator(App);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export default App;
-{
-  /* {!isUserLoading &&  <HomeScreen />} */
-}
-{
-  /* {isUserLoading &&  <ActivityIndicator style={{flex: 1}}/>} */
-}
-
-{
-  /* <HomeScreen/> */
-}
-{
-  /* {display()} */
-}
-// useEffect(()  =>  {
-//   // Create listener
-//   const listener =  Hub.listen('datastore', async hubData => {
-//     const {event, data} =  hubData.payload;
-//     if (event === 'modelSynced' && data?.model?.name === 'User') {
-//       console.log('User Model has finished syncing');
-//       setIsUserLoading(false);
-//     }
-//   });
-//   return () => listener();
-// }, []);
-// const listener = Hub.listen('datastore', async hubData => {
-//   const {event, data} = hubData.payload;
-//   if (event === 'modelSynced' && data?.model?.name === 'User') {
-//     console.log('User Model has finished syncing');
-//     setIsUserLoading(false);
-//   }
-// });
-// const display = () => {
-//   Amplify.DataStore.observeQuery(MyEntity.classType).listen((event) => {
-//     if (event.isSynced) {//boolean value
-//       print("Synced Successfully!");
-//       // even you can get synced data here also
-//       <HomeScreen/>
-//     } else {
-//       //Show ProgressBar Here
-//       print("Fetching Data From Cloud");
-//     }
-//   });
-// // }
-// const interval = setInterval(() => {
-//   console.log('This will run every second!');
-//   // setIsUserLoading(false)
-// }, 3000);
+// export default withAuthenticator(App);
+export default App;

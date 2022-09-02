@@ -27,7 +27,7 @@ const DisplayScreen = () => {
     const getDisplayUsers = async () => {
       const authUser = await Auth.currentAuthenticatedUser();
       const dbUsers = await DataStore.query(User, u =>
-        u.sub('ne', authUser.attributes.sub).gender('eq', 'Male'),
+        u.sub('ne', authUser.attributes.sub).gender('eq', currentUser.gender),
       );
       if (!dbUsers || dbUsers.length === 0) {
         return;

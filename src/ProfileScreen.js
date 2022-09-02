@@ -17,6 +17,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {S3Image} from 'aws-amplify-react-native';
+import {Picker} from '@react-native-picker/picker';
+
 
 const ProfileScreen = () => {
   const [Name, setName] = useState('');
@@ -128,7 +130,12 @@ const ProfileScreen = () => {
   };
   const logOut = async () => {
     await DataStore.clear();
-    Auth.signOut();
+    try {
+      await Auth.signOut();
+      window.location.reload();
+  } catch (error) {
+      console.log('error signing out: ', error);
+  }
   };
   const AddImage = () => {
     launchImageLibrary(
@@ -176,11 +183,16 @@ const ProfileScreen = () => {
             keyboardType="numeric"
           />
           <Text style={styles.textt}>Gender</Text>
-          <TextInput
-            style={styles.gender}
-            value={Gender}
-            onChangeText={setGender}
-          />
+
+          <Picker
+          label="Gender"
+          style={styles.gender}
+          
+          selectedValue={Gender}
+          onValueChange={itemValue => setGender(itemValue)}>
+          <Picker.Item label="Male" value="MALE" />
+          <Picker.Item label="Female" value="FEMALE" />
+        </Picker>
           <Text style={styles.textt}>Bio</Text>
           <TextInput
             style={styles.bio}
@@ -190,14 +202,12 @@ const ProfileScreen = () => {
             numberOfLines={3}
           />
           <View style={styles.profileFooter}>
-            <TouchableOpacity>
-              <Pressable style={styles.button} onPress={Submit}>
+            <TouchableOpacity style={styles.button} onPress={Submit}>
                 <Text style={styles.text}>Submit</Text>
-              </Pressable>
             </TouchableOpacity>
-            <Pressable style={styles.button} onPress={logOut}>
+            <TouchableOpacity style={styles.button} onPress={logOut}>
               <Text style={styles.text}>Log Out</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
     </ScrollView>
@@ -261,6 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     elevation: 10,
   },
+
   bio: {
     width: '92%',
     padding: 10,

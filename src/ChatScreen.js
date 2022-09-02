@@ -3,6 +3,6 @@ import {Text} from 'react-native';
 
 
 const ChatScreen = () => {
-  return<Text>Chat Screen</Text>
+  return<Text style={{color:'black'}}>Chat Screen</Text>
 }
 export default ChatScreen;
