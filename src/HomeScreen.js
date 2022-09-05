@@ -11,7 +11,7 @@ import {Auth, DataStore,Hub, Storage} from 'aws-amplify';
 import {User} from './models/';
 
 const HomeScreen = () => {
-  const [screen,setScreen]=useState("profile");
+  const [screen,setScreen]=useState("chat");
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
 

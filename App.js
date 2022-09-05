@@ -73,3 +73,16 @@ const style = StyleSheet.create({
 });
 // export default withAuthenticator(App);
 export default App;
+
+
+// export const onCreateChatData = /* GraphQL */ `
+//   subscription onCreateChatData {
+//     onCreateChatData {
+//       id
+//       from
+//       to
+//       message
+//       time
+//     }
+//   }
+// `;

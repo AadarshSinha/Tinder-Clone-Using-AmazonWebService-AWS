@@ -4,6 +4,14 @@ import { ModelInit, MutableModel, PersistentModelConstructor } from "@aws-amplif
 
 
 
+type ChatUsersMetaData = {
+  readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
+type ChatDataMetaData = {
+  readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
 type MatchesMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
@@ -14,6 +22,28 @@ type WaitlingListMetaData = {
 
 type UserMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
+export declare class ChatUsers {
+  readonly id: string;
+  readonly from: string;
+  readonly to: string;
+  readonly message: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  constructor(init: ModelInit<ChatUsers, ChatUsersMetaData>);
+  static copyOf(source: ChatUsers, mutator: (draft: MutableModel<ChatUsers, ChatUsersMetaData>) => MutableModel<ChatUsers, ChatUsersMetaData> | void): ChatUsers;
+}
+
+export declare class ChatData {
+  readonly id: string;
+  readonly from: string;
+  readonly to: string;
+  readonly message: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  constructor(init: ModelInit<ChatData, ChatDataMetaData>);
+  static copyOf(source: ChatData, mutator: (draft: MutableModel<ChatData, ChatDataMetaData>) => MutableModel<ChatData, ChatDataMetaData> | void): ChatData;
 }
 
 export declare class Matches {

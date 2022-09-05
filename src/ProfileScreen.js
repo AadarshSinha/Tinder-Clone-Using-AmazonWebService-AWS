@@ -33,7 +33,7 @@ const ProfileScreen = () => {
     const getCurrentUser = async () => {
       const authUser = await Auth.currentAuthenticatedUser();
 
-      console.log('sub = ', authUser.attributes.sub);
+      // console.log('sub = ', authUser.attributes.sub);
       const dbUsers = await DataStore.query(User, u =>
         u.sub('eq', authUser.attributes.sub),
       );
@@ -43,7 +43,7 @@ const ProfileScreen = () => {
         return;
       }
       const dbUser = dbUsers[0];
-      console.log('dbuser ', dbUser);
+      // console.log('dbuser ', dbUser);
       setUser(dbUser);
       setName(dbUser.name);
       setBio(dbUser.bio);
@@ -160,7 +160,7 @@ const ProfileScreen = () => {
       return <Image source={{uri: Uri}} style={styles.s3image} />;
     }
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${Uri}`;
-    console.log('url = ' + url);
+    // console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.s3image} />;
 
   };
@@ -228,11 +228,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   s3image: {
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     borderWidth: 1,
     padding: 1,
-    borderRadius: 100,
+    borderRadius: 150,
   },
   name: {
     width: '92%',
