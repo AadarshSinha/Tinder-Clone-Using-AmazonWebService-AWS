@@ -1,19 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
-import {User, WaitlingList, Matches} from './models';
+import {User, WaitlingList, Matches,ChatUsers} from './models';
 import DisplayMatches from './DisplayMatches';
 import DisplayMessage from './DisplayMessage';
 import Messanger from './Messanger';
 const ChatScreen = () => {
   const [matches, setMatches] = useState([]);
+  const [chats, setChats] = useState([]);
   const [userSub, setUserSub] = useState(null);
   const [loverSub, setLoverSub] = useState(null);
   const [isChatting, setIsChatting] = useState(false);
   useEffect(() => {
     const getMatchedUsers = async () => {
       const authUser = await Auth.currentAuthenticatedUser();
-      // console.log(authUser.attributes.sub)
       setUserSub(authUser.attributes.sub);
       const dbUsers = await DataStore.query(Matches, u1 =>
         u1.or(u2 =>
@@ -22,13 +22,27 @@ const ChatScreen = () => {
             .user2('eq', authUser.attributes.sub),
         ),
       );
-      // console.log(dbUsers)
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }
       setMatches(dbUsers);
     };
+    const getChatUsers = async () => {
+      const authUser = await Auth.currentAuthenticatedUser();
+      const dbUsers = await DataStore.query(ChatUsers, u1 =>
+        u1.or(u2 =>
+          u2
+            .from('eq', authUser.attributes.sub)
+            .to('eq', authUser.attributes.sub),
+        ),
+      );
+      if (!dbUsers || dbUsers.length === 0) {
+        return;
+      }
+      setChats(dbUsers);
+    };
     getMatchedUsers();
+    getChatUsers();
   }, []);
   useEffect(() => {
     if (loverSub == null) return;
@@ -59,12 +73,14 @@ const ChatScreen = () => {
       </ScrollView>
       <Text style={styles.head}>Messages</Text>
       <ScrollView style={styles.message} horizontal={false}>
-        {matches.length != 0 &&
-          matches.map(match => (
+        {chats.length != 0 &&
+          chats.map(match => (
             <DisplayMessage
-              sub={match.user1 === userSub ? match.user2 : match.user1}
+              sub={match.from === userSub ? match.to : match.from}
               key={match.id}
               setLoverSub={setLoverSub}
+              updated={match.updatedAt}
+              lastMessage={match.message}
             />
           ))}
       </ScrollView>
@@ -75,12 +91,10 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '90%',
-    // backgroundColor:'green',
   },
   scroll: {
     width: '100%',
     marginTop: 10,
-    // backgroundColor:'yellow',
   },
   head: {
     color: '#F76C6B',

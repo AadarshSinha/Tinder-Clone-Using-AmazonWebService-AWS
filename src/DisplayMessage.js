@@ -2,7 +2,9 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Image, Text, Pressable} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches} from './models';
-const DisplayMessage = ({sub, setLoverSub}) => {
+import moment from "moment";
+
+const DisplayMessage = ({sub, setLoverSub,lastMessage,updated}) => {
   const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     const getCurrentUsers = async () => {
@@ -16,7 +18,6 @@ const DisplayMessage = ({sub, setLoverSub}) => {
   }, []);
   const display = () => {
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${currentUser.image}`;
-    // console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.image} />;
   };
   if (currentUser === null) return;
@@ -28,7 +29,8 @@ const DisplayMessage = ({sub, setLoverSub}) => {
       <View style={styles.container}>
         {display()}
         <Text style={styles.text1}>{currentUser.name}</Text>
-        <Text style={styles.text2}>Age : {currentUser.age}</Text>
+        <Text style={styles.text2}>{lastMessage}</Text>
+        <Text style={styles.text3}>{moment(updated).fromNow()}</Text>
       </View>
     </Pressable>
   );
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '800',
     left: 120,
-    top: 20,
+    top: 10,
     fontFamily: 'Open Sans',
     width: 200,
     overflow: 'hidden',
@@ -65,9 +67,15 @@ const styles = StyleSheet.create({
   },
   text2: {
     position: 'absolute',
-    top: 55,
+    top: 60,
     color: 'white',
     left: 120,
+  },
+  text3: {
+    position: 'absolute',
+    top: 60,
+    color: 'white',
+    right: 10,
   },
 });
 export default DisplayMessage;

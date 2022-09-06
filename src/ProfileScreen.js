@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {S3Image} from 'aws-amplify-react-native';
 import {Picker} from '@react-native-picker/picker';
-
+import moment from 'moment';
 
 const ProfileScreen = () => {
   const [Name, setName] = useState('');
@@ -77,9 +77,10 @@ const ProfileScreen = () => {
       const extension = urlParts[urlParts.length - 1];
 
       const authUser = await Auth.currentAuthenticatedUser();
-      const key = `${authUser.attributes.sub}.${extension}`;
+      const key = `${authUser.attributes.sub}${moment()}.${extension}`;
 
-      console.log('user uploaded successfully');
+      console.log('user added to s3 successfully');
+      setIsPick(false);
       await Storage.put(key, blob);
       return key;
     } catch (e) {
@@ -95,12 +96,12 @@ const ProfileScreen = () => {
     console.log('Current User');
     console.log(user);
     let newImage;
-    if (isPick) {
+    if (isPick ) {
       newImage = await uploadImage();
       // DataStore.clear()
     }
     console.log('newImage = ' + newImage);
-    if (!user) {
+    if (user.length===0) {
       console.log('Adding new user data');
       const authUser = await Auth.currentAuthenticatedUser();
       const newUser = new User({
@@ -126,7 +127,7 @@ const ProfileScreen = () => {
     });
     await DataStore.save(updatedUser);
 
-    console.log('updated user to db');
+    console.log('update successful');
   };
   const logOut = async () => {
     await DataStore.clear();
@@ -148,7 +149,7 @@ const ProfileScreen = () => {
         }
         setUri(assets[0].uri);
         setIsPick(true);
-        console.log('picked image = ' + Uri);
+        console.log('picked image = ' + assets[0].uri);
       },
     );
   };
@@ -160,7 +161,7 @@ const ProfileScreen = () => {
       return <Image source={{uri: Uri}} style={styles.s3image} />;
     }
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${Uri}`;
-    // console.log('url = ' + url);
+    console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.s3image} />;
 
   };

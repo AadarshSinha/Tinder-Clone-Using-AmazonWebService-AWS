@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
-import {User, WaitlingList, Matches} from './models';
+import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card from './Card';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -24,42 +24,56 @@ const DisplayScreen = () => {
       setCurrentUser(dbUsers[0]);
     };
     getCurrentUser();
-    const getDisplayUsers = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const dbUsers = await DataStore.query(User, u =>
-        u.sub('ne', authUser.attributes.sub).gender('ne', currentUser.gender),
-      );
-      if (!dbUsers || dbUsers.length === 0) {
-        return;
-      }
-      setUsers(dbUsers);
-    };
-    getDisplayUsers();
   }, []);
-  useEffect(() => {
-    if (users === null) return;
+  const getDisplayUsers = async () => {
+    const dbUsers = await DataStore.query(User, u =>
+      u.sub('ne', currentUser.sub).gender('ne', currentUser.gender),
+    );
+    if (!dbUsers || dbUsers.length === 0) {
+      return;
+    }
+    setUsers(dbUsers);
     setLoading(false);
-  }, [users]);
+  };
+  useEffect(() => {
+    if (currentUser === null || currentUser.length === 0) return;
+    getDisplayUsers();
+  }, currentUser);
   const handleLike = async () => {
-    console.log('like');
+    const checkExistingMatch = await DataStore.query(Matches, u1 =>
+      u1.or(u2 =>
+        u2
+          .and(u3 =>
+            u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+          )
+          .and(u4 =>
+            u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+          ),
+      ),
+    );
+    if (checkExistingMatch.length !== 0) {
+      console.log('user alredy matched');
+      setIndex((index + 1) % users.length);
+      return;
+    }
     const checkRepeat = await DataStore.query(WaitlingList, u =>
       u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
     );
-    if (!(!checkRepeat || checkRepeat.length === 0)) {
+    if (checkRepeat.length !== 0) {
       console.log('user alredy liked');
       setIndex((index + 1) % users.length);
       return;
     }
-    const newWait = new WaitlingList({
-      user1: currentUser.sub,
-      user2: users[index].sub,
-    });
-    await DataStore.save(newWait);
     const checkMatch = await DataStore.query(WaitlingList, u =>
       u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
     );
-    if (!checkMatch || checkMatch.length === 0) {
-      console.log('No new matches');
+    if (checkMatch.length === 0) {
+      const newWait = new WaitlingList({
+        user1: currentUser.sub,
+        user2: users[index].sub,
+      });
+      await DataStore.save(newWait);
+      console.log('no new matches');
       setIndex((index + 1) % users.length);
       return;
     }
@@ -69,24 +83,50 @@ const DisplayScreen = () => {
       user2: users[index].sub,
     });
     await DataStore.save(newMatch);
-    setIndex((index + 1) % users.length);
-  };
-  const handleDislike = async () => {
-    console.log('dislike');
     await DataStore.delete(WaitlingList, u =>
-      u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+      u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+      );
+      setIndex((index + 1) % users.length);
+    };
+    const handleDislike = async () => {
+      console.log('dislike');
+      // console.log(currentUser.sub, ' ', users[index].sub);
+      const checkExistingMatch = await DataStore.query(Matches, u1 =>
+        u1.or(u2 =>
+          u2
+          .and(u3 =>
+            u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+            )
+            .and(u4 =>
+              u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+          ),
+      ),
     );
-    await DataStore.delete(Matches, u =>
+    if (checkExistingMatch.length !== 0) {
+      console.log('user is matched , deleting it');
+      await DataStore.delete(Matches, u1 =>
+        u1.user2('eq', currentUser.sub).user1('eq', users[index].sub),
+        );
+        await DataStore.delete(Matches, u =>
+          u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+          );
+          console.log("creating new waiting")
+          const newWait = new WaitlingList({
+            user2: currentUser.sub,
+            user1: users[index].sub,
+          });
+          await DataStore.save(newWait);
+          setIndex((index + 1) % users.length);
+          return;
+        }
+        await DataStore.delete(WaitlingList, u =>
       u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
-    );
-    await DataStore.delete(Matches, u =>
-      u.user2('eq', currentUser.sub).user1('eq', users[index].sub),
     );
     setIndex((index + 1) % users.length);
   };
   return (
     <SafeAreaView style={styles.DisplayContainer}>
-      {!loading && <Card user={users[index]} />}
+      {!loading && <Card user={users[index]}/>}
       <View style={styles.bottomNavigation}>
         <TouchableOpacity onPress={handleDislike}>
           <Entypo

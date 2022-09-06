@@ -72,7 +72,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
           ),
         {sort: s => s.createdAt()},
       );
-      console.log('Messages = ', dbUsers);
+      // console.log('Messages = ', dbUsers);
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-    backgroundColor: '#b5b5b5',
+    backgroundColor: 'white',
   },
   navbar: {
     width: '100%',

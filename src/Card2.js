@@ -1,21 +1,37 @@
-import { S3Image } from 'aws-amplify-react-native/dist/Storage';
-import React from 'react'
+import React, { useState ,useEffect} from 'react'
 import { View, Image, StyleSheet, Text } from 'react-native'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-
+import {Auth, DataStore} from 'aws-amplify';
+import {User, WaitlingList, Matches, ChatUsers} from './models';
 
 export default function Card({ user }) {
+  console.log("card2 = ",user)
+  const [currentUser,setCurrentUser] = useState(null)
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const authUser = await Auth.currentAuthenticatedUser();
+      const dbUsers = await DataStore.query(User, u =>
+        u.sub('eq', user.user1),
+      );
+      if (!dbUsers || dbUsers.length === 0) {
+        return;
+      }
+      setCurrentUser(dbUsers[0]);
+    };
+    getCurrentUser();
+  }, []);
   const diasplayImage = () => {
-    return <Image source={{uri: `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${user.image}`}} style={styles.photo} />; 
+    return <Image source={{uri: `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${currentUser.image}`}} style={styles.photo} />; 
   } 
+  if (currentUser === null) return;
   return (
     
     <View style={styles.CardContainer}>
        {diasplayImage()}
       <View style={styles.textContainer}>
         <View style={styles.textRow}>
-          <Text style={[styles.textPrimary, styles.textShadow]}>{user.name}</Text>
-          <Text style={[styles.textSecondary, styles.textShadow]}>{user.age}  </Text>
+          <Text style={[styles.textPrimary, styles.textShadow]}>{currentUser.name}</Text>
+          <Text style={[styles.textSecondary, styles.textShadow]}>{currentUser.age}  </Text>
           <FontAwesome5 name="info-circle" size={20} color="white"></FontAwesome5>
         </View>
       </View>
