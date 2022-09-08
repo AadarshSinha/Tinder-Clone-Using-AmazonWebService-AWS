@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import {View, StyleSheet, TouchableOpacity,Text, SafeAreaView} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card2 from './Card2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const DisplayScreen = () => {
   const [users, setUsers] = useState(null);
@@ -126,16 +127,28 @@ const DisplayScreen = () => {
     );
     setIndex((index + 1) % users.length);
   };
+  const handleSkip = () => {
+    setIndex((index + 1) % users.length);
+  }
   return (
     <SafeAreaView style={styles.DisplayContainer}>
+      <Text style={styles.Title}>Users Who Already Liked You</Text>
       {!loading && <Card2 user={users[index]} />}
-      <View style={styles.bottomNavigation}>
+      {!loading && users.length!=0 && <View style={styles.bottomNavigation}>
         <TouchableOpacity onPress={handleDislike}>
           <Entypo
             name="cross"
             size={40}
             color="#A65CD2"
             style={styles.button}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSkip}>
+          <FontAwesome
+            name="refresh"
+            size={43}
+            color="#F6BE00"
+            style={styles.button1}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLike}>
@@ -146,14 +159,23 @@ const DisplayScreen = () => {
             style={styles.button}
           />
         </TouchableOpacity>
-      </View>
+      </View>}
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
+  Title:{
+    width:'100%',
+    color:'#F76C6B',
+    fontSize:20,
+    fontWeight:'800',
+    textAlign:'center',
+    position:'absolute',
+    top:70,
+  },
   bottomNavigation: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     width: '100%',
     position: 'absolute',
     bottom: 20,
@@ -167,6 +189,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 50,
+  },
+  button1: {
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 50,
+    paddingLeft:12,
   },
   DisplayContainer: {
     width: '100%',

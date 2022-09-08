@@ -4,11 +4,12 @@ import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches} from './models';
 import moment from "moment";
 
-const DisplayMessage = ({sub, setLoverSub,lastMessage,updated}) => {
+const DisplayMessage = ({loverSub, setLoverSub,lastMessage,updated}) => {
   const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
     const getCurrentUsers = async () => {
-      const dbUsers = await DataStore.query(User, u1 => u1.sub('eq', sub));
+      const dbUsers = await DataStore.query(User, u1 => u1.sub('eq', loverSub));
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }

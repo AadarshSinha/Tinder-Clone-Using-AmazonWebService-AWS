@@ -1,3 +1,9 @@
+type Block @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  by: String!
+  to: String!
+}
+
 type ChatUsers @model @auth(rules: [{allow: public}]) {
   id: ID!
   from: String!

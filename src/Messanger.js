@@ -8,18 +8,70 @@ import {
   TextInput,
   ScrollView,
   FlatList,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 import {Auth, DataStore, API} from 'aws-amplify';
-import {User, WaitlingList, Matches, ChatUsers, ChatData} from './models';
+import {User, WaitlingList, Matches, ChatUsers, ChatData,Block} from './models';
 import ChatMessage from './ChatMessage';
-import {onCreateChatData} from './models/schema';
+import {onCreateChatData,onDeleteBlock,onCreateBlock} from './models/schema';
 
 const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [lover, setLover] = useState(null);
   const [msg, setMsg] = useState(null);
   const [chatContent, setChatContent] = useState([]);
+  const [blockKiya, setBlockKiya] = useState(false);
+  const [blockHua, setBlockHua] = useState(false);
+  const [drop,setDrop]=useState(false)
+  const checkBlock = async () => {
+    const dbUsers = await DataStore.query(
+      Block,
+      u1 =>
+        u1.or(u2 =>
+          u2
+            .and(u3 => u3.by('eq', from).to('eq', to))
+            .and(u4 => u4.by('eq', to).to('eq', from)),
+        )
+    );
+    // console.log('Messages = ', dbUsers);
+    if (!dbUsers || dbUsers.length === 0) {
+      setBlockHua(false);
+      setBlockKiya(false);
+      return;
+    }
+    if(dbUsers[0].by===from)setBlockKiya(true)
+    else setBlockHua(true)
+  };
+  useEffect(()=>{
+    checkBlock();
+  },[])
+  useEffect(() => {
+    const checkBlockUpdate = API.graphql({
+      query: onDeleteBlock,
+    }).subscribe({
+      next: data => {
+        const newMsg = data.value.data.onDeleteBlock;
+        console.log('newMsg = ', newMsg);
+        checkBlock();
+      },
+    });
+    return () => checkBlockUpdate.unsubscribe();
+  }, []);
+  useEffect(() => {
+    const checkBlockUpdate = API.graphql({
+      query: onCreateBlock,
+    }).subscribe({
+      next: data => {
+        const newMsg = data.value.data.onCreateBlock;
+        console.log('newMsg = ', newMsg);
+        checkBlock();
+      },
+    });
+    return () => checkBlockUpdate.unsubscribe();
+  }, []);
   useEffect(() => {
     const getCurrentUsers = async () => {
       const dbUsers = await DataStore.query(User, u1 => u1.sub('eq', from));
@@ -48,7 +100,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         const newMsg = data.value.data.onCreateChatData;
         if (
           !(
-            (newMsg.from === from && newMsg.to === to) ||
+            // (newMsg.from === from && newMsg.to === to) ||
             (newMsg.from === to && newMsg.to === from)
             )
             ) {
@@ -114,7 +166,14 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
     setIsChatting(false);
   };
   const handleSend = async () => {
-    if (msg == '') return;
+    if (msg === null) return;
+    console.log("hello")
+    const newMsg={
+      from,
+      to,
+      message:msg
+    }
+    setChatContent(chatContent => [newMsg, ...chatContent]);
     updateData()
     const currentMsg = new ChatData({
       from: from,
@@ -125,6 +184,27 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
     setMsg('');
     console.log('Added new message');
   };
+  const handleBlock = async () =>{
+    setDrop(false)
+    if(blockHua)return;
+    if(blockKiya){
+      await DataStore.delete(Block, u =>
+        u.by('eq', from).to('eq', to),
+        );
+        Alert.alert("User unblocked successfully")
+        console.log("unblocked the user")
+        return
+      }
+      const newBlockuser = new Block({
+        by:from,
+        to:to,
+      });
+      await DataStore.save(newBlockuser);
+      Alert.alert("User blocked successfully")
+    console.log("blocked the user")
+
+
+  }
   if (lover === null) return;
   return (
     <View style={styles.container}>
@@ -134,6 +214,17 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         </Pressable>
         {display()}
         <Text style={styles.namee}>{lover.name}</Text>
+        <Pressable onPress={()=>setDrop(!drop)} style={styles.option}>
+          <View style={styles.blockContainer}>
+
+          <Fontisto name="more-v-a" size={30} color="white" />
+          </View>
+        </Pressable>
+        {/* <View style={styles.optionContainer}> */}
+        {drop &&<TouchableOpacity onPress={handleBlock} style={styles.optionContainer}>
+        {blockKiya && <Text style={styles.block}>Unblock</Text>}
+        {!blockHua && !blockKiya &&<Text style={styles.block}>Block</Text>}
+        </TouchableOpacity>}
       </View>
       <FlatList
         data={chatContent}
@@ -143,7 +234,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         inverted
         style={styles.content}
       />
-      <View style={styles.bottom}>
+      {(!blockHua && !blockKiya)? <View style={styles.bottom}>
         <TextInput
           style={styles.input}
           value={msg}
@@ -155,12 +246,46 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         />
         <Pressable onPress={handleSend}>
           <Ionicons name="send" size={50} color="white" />
+          
         </Pressable>
+      </View>:
+      <View>
+        <Text style={styles.warning}>You can not message this user</Text>
       </View>
+      }
     </View>
   );
 };
 const styles = StyleSheet.create({
+  optionContainer:{
+    position:'relative',
+    top:-20,
+  },
+  warning:{
+    backgroundColor:'#F76C6B',
+    color:'white',
+    textAlign:'center',
+    padding:10,
+  },
+  blockContainer:{
+    width:30,
+    textAlign:'center',
+    alignItems:'center',
+  },
+  block:{
+    backgroundColor:'orange',
+    position:'absolute',
+    right:0,
+    color:'white',
+    fontSize:20,
+    padding:10,
+    borderRadius:10,
+    fontWeight:'500',
+  },
+  option:{
+    right:25,
+    position:'absolute',
+  },
   content: {
     width: '100%',
     height: '100%',
@@ -199,6 +324,9 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '800',
     color: 'white',
+    maxWidth:'50%',
+    height:40,
+    overflow:'hidden',
   },
   bottom: {
     width: '100%',

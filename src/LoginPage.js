@@ -21,7 +21,19 @@ const LoginPage = ({setLoading}) => {
       console.log(response);
       // setLoading(false);
     } catch (e) {
-      Alert.alert('Ops..', e.message);
+      console.log(e)
+      if(e.code==="UserNotConfirmedException"){
+        console.log("hello")
+        try {
+          
+          await Auth.resendSignUp(number);
+        } catch (error) {
+          console.log(error)
+        }
+        setScreen('verifyNew')
+        return;
+      }
+      Alert.alert(e.message);
     }
   };
   const resendOTP = async() => {
@@ -29,6 +41,7 @@ const LoginPage = ({setLoading}) => {
         await Auth.resendSignUp(number);
         Alert.alert("OTP sent successfully");
   } catch (e) {
+
       Alert.alert( e.message);
   }
   };
@@ -103,6 +116,8 @@ const LoginPage = ({setLoading}) => {
             onChangeText={setPassword}
             placeholder="Enter Password"
             placeholderTextColor="grey"
+            textContentType='password'
+            secureTextEntry={true}
           />
           <TouchableOpacity style={styles.button} onPress={SignIn}>
             <Text style={styles.text}>Sign In</Text>
@@ -138,6 +153,7 @@ const LoginPage = ({setLoading}) => {
             onChangeText={setPassword}
             placeholder="Enter New Password"
             placeholderTextColor="grey"
+            secureTextEntry={true}
           />
           <TouchableOpacity style={styles.button} onPress={Continue}>
             <Text style={styles.text}>continue</Text>
@@ -166,6 +182,7 @@ const LoginPage = ({setLoading}) => {
             onChangeText={setPassword}
             placeholder="Enter Password"
             placeholderTextColor="grey"
+            secureTextEntry={true}
           />
           <TouchableOpacity style={styles.button} onPress={Register}>
             <Text style={styles.text}>Register</Text>

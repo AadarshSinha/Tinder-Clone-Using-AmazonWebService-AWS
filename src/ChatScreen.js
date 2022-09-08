@@ -1,46 +1,65 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Auth, DataStore} from 'aws-amplify';
-import {User, WaitlingList, Matches,ChatUsers} from './models';
+import {Auth, DataStore,API} from 'aws-amplify';
+import {User, WaitlingList, Matches, ChatUsers} from './models';
 import DisplayMatches from './DisplayMatches';
 import DisplayMessage from './DisplayMessage';
 import Messanger from './Messanger';
+import {onUpdateChatUsers} from './models/schema';
+
 const ChatScreen = () => {
   const [matches, setMatches] = useState([]);
   const [chats, setChats] = useState([]);
   const [userSub, setUserSub] = useState(null);
   const [loverSub, setLoverSub] = useState(null);
   const [isChatting, setIsChatting] = useState(false);
-  useEffect(() => {
-    const getMatchedUsers = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      setUserSub(authUser.attributes.sub);
-      const dbUsers = await DataStore.query(Matches, u1 =>
-        u1.or(u2 =>
-          u2
-            .user1('eq', authUser.attributes.sub)
-            .user2('eq', authUser.attributes.sub),
-        ),
-      );
-      if (!dbUsers || dbUsers.length === 0) {
-        return;
-      }
-      setMatches(dbUsers);
-    };
-    const getChatUsers = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const dbUsers = await DataStore.query(ChatUsers, u1 =>
+  const getMatchedUsers = async () => {
+    const authUser = await Auth.currentAuthenticatedUser();
+    setUserSub(authUser.attributes.sub);
+    const dbUsers = await DataStore.query(Matches, u1 =>
+      u1.or(u2 =>
+        u2
+          .user1('eq', authUser.attributes.sub)
+          .user2('eq', authUser.attributes.sub),
+      ),
+    );
+    if (!dbUsers || dbUsers.length === 0) {
+      return;
+    }
+    setMatches(dbUsers);
+  };
+  const getChatUsers = async () => {
+    const authUser = await Auth.currentAuthenticatedUser();
+    setUserSub(authUser.attributes.sub);
+    const dbUsers = await DataStore.query(
+      ChatUsers,
+      u1 =>
         u1.or(u2 =>
           u2
             .from('eq', authUser.attributes.sub)
             .to('eq', authUser.attributes.sub),
         ),
-      );
-      if (!dbUsers || dbUsers.length === 0) {
-        return;
-      }
-      setChats(dbUsers);
-    };
+      {sort: s => s.updatedAt()},
+    );
+    if (!dbUsers || dbUsers.length === 0) {
+      return;
+    }
+    setChats(dbUsers);
+  };
+  useEffect(() => {
+    const subscription = API.graphql({
+      query: onUpdateChatUsers,
+    }).subscribe({
+      next: data => {
+        const newMsg = data.value.data.onUpdateChatUsers;
+        if(newMsg.from===userSub || newMsg.to===userSub || userSub===null){
+          getChatUsers();
+        }
+      },
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  useEffect(() => {
     getMatchedUsers();
     getChatUsers();
   }, []);
@@ -49,6 +68,7 @@ const ChatScreen = () => {
     console.log('you click on your lover ', loverSub);
     setIsChatting(true);
   }, loverSub);
+  if(userSub===null)return;
   if (isChatting)
     return (
       <Messanger
@@ -76,7 +96,7 @@ const ChatScreen = () => {
         {chats.length != 0 &&
           chats.map(match => (
             <DisplayMessage
-              sub={match.from === userSub ? match.to : match.from}
+              loverSub={match.from === userSub ? match.to : match.from}
               key={match.id}
               setLoverSub={setLoverSub}
               updated={match.updatedAt}

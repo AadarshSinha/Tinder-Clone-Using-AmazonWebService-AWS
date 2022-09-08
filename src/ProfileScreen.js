@@ -10,6 +10,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableNativeFeedback,
+  Alert
 } from 'react-native';
 import {Auth, DataStore, Storage} from 'aws-amplify';
 import {User} from './models/';
@@ -80,7 +81,6 @@ const ProfileScreen = () => {
       const key = `${authUser.attributes.sub}${moment()}.${extension}`;
 
       console.log('user added to s3 successfully');
-      setIsPick(false);
       await Storage.put(key, blob);
       return key;
     } catch (e) {
@@ -126,7 +126,7 @@ const ProfileScreen = () => {
       if (isPick) updated.image = newImage;
     });
     await DataStore.save(updatedUser);
-
+    Alert.alert("Updated Successful")
     console.log('update successful');
   };
   const logOut = async () => {

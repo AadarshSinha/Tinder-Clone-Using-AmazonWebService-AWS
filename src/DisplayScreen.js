@@ -5,6 +5,7 @@ import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card from './Card';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const DisplayScreen = () => {
   const [users, setUsers] = useState(null);
@@ -28,6 +29,7 @@ const DisplayScreen = () => {
   const getDisplayUsers = async () => {
     const dbUsers = await DataStore.query(User, u =>
       u.sub('ne', currentUser.sub).gender('ne', currentUser.gender),
+      {sort: s => s.createdAt()},
     );
     if (!dbUsers || dbUsers.length === 0) {
       return;
@@ -124,16 +126,27 @@ const DisplayScreen = () => {
     );
     setIndex((index + 1) % users.length);
   };
+  const handleSkip = () => {
+    setIndex((index + 1) % users.length);
+  }
   return (
     <SafeAreaView style={styles.DisplayContainer}>
       {!loading && <Card user={users[index]}/>}
-      <View style={styles.bottomNavigation}>
+     {!loading && users.length!==0 && <View style={styles.bottomNavigation}>
         <TouchableOpacity onPress={handleDislike}>
           <Entypo
             name="cross"
             size={40}
             color="#A65CD2"
             style={styles.button}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSkip}>
+          <FontAwesome
+            name="refresh"
+            size={43}
+            color="#F6BE00"
+            style={styles.button1}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLike}>
@@ -144,14 +157,14 @@ const DisplayScreen = () => {
             style={styles.button}
           />
         </TouchableOpacity>
-      </View>
+      </View>}
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   bottomNavigation: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     width: '100%',
     position: 'absolute',
     bottom: 20,
@@ -165,6 +178,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 50,
+  },
+  button1: {
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 50,
+    paddingLeft:12,
+
   },
   DisplayContainer: {
     width: '100%',

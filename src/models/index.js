@@ -4,9 +4,10 @@ import { schema } from './schema';
 
 
 
-const { ChatUsers, ChatData, Matches, WaitlingList, User } = initSchema(schema);
+const { Block, ChatUsers, ChatData, Matches, WaitlingList, User } = initSchema(schema);
 
 export {
+  Block,
   ChatUsers,
   ChatData,
   Matches,

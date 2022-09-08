@@ -15,7 +15,6 @@ const HomeScreen = () => {
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
 
-
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
@@ -35,7 +34,7 @@ const HomeScreen = () => {
       
       {screen==="display" && <DisplayScreen/>}
       {screen==="match"  && <MatchScreen />}
-      {screen==="chat" && <ChatScreen/>}
+      {screen==="chat" && <ChatScreen />}
       {screen==="profile" &&  <ProfileScreen />}
     </View>
   );

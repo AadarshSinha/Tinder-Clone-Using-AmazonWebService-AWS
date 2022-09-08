@@ -82,7 +82,32 @@ export default App;
 //       from
 //       to
 //       message
-//       time
+//     }
+//   }
+// `;
+// export const onUpdateChatUsers = /* GraphQL */ `
+//   subscription onUpdateChatUsers {
+//     onUpdateChatUsers {
+//       id
+//       from
+//       to
+//       message
+//     }
+//   }
+// `;
+// export const onCreateBlock = /* GraphQL */ `
+//   subscription onCreateBlock {
+//     onCreateBlock {
+//       by
+//       to
+//     }
+//   }
+// `;
+// export const onDeleteBlock = /* GraphQL */ `
+//   subscription onDeleteBlock {
+//     onDeleteBlock {
+//       by
+//       to
 //     }
 //   }
 // `;

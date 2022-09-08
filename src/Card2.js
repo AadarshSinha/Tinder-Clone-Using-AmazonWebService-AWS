@@ -5,8 +5,9 @@ import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 
 export default function Card({ user }) {
-  console.log("card2 = ",user)
   const [currentUser,setCurrentUser] = useState(null)
+  const [bio,setBio] =useState(false)
+
   useEffect(() => {
     const getCurrentUser = async () => {
       const authUser = await Auth.currentAuthenticatedUser();
@@ -30,16 +31,24 @@ export default function Card({ user }) {
        {diasplayImage()}
       <View style={styles.textContainer}>
         <View style={styles.textRow}>
+        <Text style={styles.abc}>
           <Text style={[styles.textPrimary, styles.textShadow]}>{currentUser.name}</Text>
-          <Text style={[styles.textSecondary, styles.textShadow]}>{currentUser.age}  </Text>
-          <FontAwesome5 name="info-circle" size={20} color="white"></FontAwesome5>
+        </Text>
+          <Text style={[styles.textSecondary, styles.textShadow]}>  {currentUser.age}  </Text>
+          <FontAwesome5 name="info-circle" size={20} color="white" onPress={()=>{setBio(!bio)}}></FontAwesome5>
         </View>
+        {bio && <View style={styles.BioRow}>
+        <Text style={[styles.textSecondary, styles.textShadow]}>{currentUser.bio}</Text>
+        </View>}
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  abc:{
+    maxWidth:'90%'
+  },
   CardContainer:{
     // backgroundColor:'red',
     width:'100%',
@@ -47,8 +56,12 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
   },
+  BioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   photo: {
-    height: '98%',
+    height: '95%',
     width:'94%',
     backgroundColor:"white",
     resizeMode: 'cover',
@@ -58,6 +71,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     left: '5%',
+    maxWidth:'90%',
+    paddingBottom:15,
   },
   textRow: {
     flexDirection: 'row',
@@ -70,7 +85,6 @@ const styles = StyleSheet.create({
   },
   textSecondary: {
     color: 'white',
-    marginLeft: 10,
     fontSize: 25,
   },
   textShadow: {

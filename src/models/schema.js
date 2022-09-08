@@ -1,5 +1,71 @@
 export const schema = {
     "models": {
+        "Block": {
+            "name": "Block",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "by": {
+                    "name": "by",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "to": {
+                    "name": "to",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "Blocks",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "ChatUsers": {
             "name": "ChatUsers",
             "fields": {
@@ -375,7 +441,7 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "b0677f50626c477413942496002d6a3e"
+    "version": "a00605c4859da59c0b4b2434946f6506"
 };
 export const onCreateChatData = /* GraphQL */ `
   subscription onCreateChatData {
@@ -384,6 +450,32 @@ export const onCreateChatData = /* GraphQL */ `
       from
       to
       message
+    }
+  }
+`;
+export const onUpdateChatUsers = /* GraphQL */ `
+  subscription onUpdateChatUsers {
+    onUpdateChatUsers {
+      id
+      from
+      to
+      message
+    }
+  }
+`;
+export const onCreateBlock = /* GraphQL */ `
+  subscription onCreateBlock {
+    onCreateBlock {
+      by
+      to
+    }
+  }
+`;
+export const onDeleteBlock = /* GraphQL */ `
+  subscription onDeleteBlock {
+    onDeleteBlock {
+      by
+      to
     }
   }
 `;
