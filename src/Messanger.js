@@ -289,9 +289,9 @@ const styles = StyleSheet.create({
   content: {
     width: '100%',
     height: '100%',
-    color: 'black',
     marginBottom: 80,
     marginTop: 1,
+    backgroundColor:'white'
   },
   container: {
     width: '100%',
@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     justifyContent: 'space-evenly',
     // display: 'none',
+    // backgroundColor:'grey'
   },
   input: {
     backgroundColor: 'white',

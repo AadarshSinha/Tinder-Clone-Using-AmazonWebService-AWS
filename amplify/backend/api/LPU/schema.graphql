@@ -1,3 +1,9 @@
+type Feedback @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  type: String!
+  message: String!
+}
+
 type Block @model @auth(rules: [{allow: public}]) {
   id: ID!
   by: String!

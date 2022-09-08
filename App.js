@@ -71,7 +71,6 @@ const style = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
-// export default withAuthenticator(App);
 export default App;
 
 

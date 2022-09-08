@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, SafeAreaView,Text} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card from './Card';
@@ -129,6 +129,15 @@ const DisplayScreen = () => {
   const handleSkip = () => {
     setIndex((index + 1) % users.length);
   }
+  if(users===null||users.length===0){
+    return (
+      <View style={styles.nouserContainer}>
+        <Text style={styles.Title1}>Users Who Already Liked You</Text>
+         <Text style={styles.nouser1}>Opps..</Text>
+         <Text style={styles.nouser2}>No Users to Show</Text>
+      </View>
+     ) 
+  }
   return (
     <SafeAreaView style={styles.DisplayContainer}>
       {!loading && <Card user={users[index]}/>}
@@ -195,6 +204,30 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
     paddingTop: 80,
+  },
+  Title1:{
+    width:'100%',
+    color:'#F76C6B',
+    fontSize:20,
+    fontWeight:'800',
+    textAlign:'center',
+    position:'absolute',
+    top:10,
+  },
+  nouser1:{
+    color:'#F76C6B',
+    fontSize:80,
+    fontWeight:'800'
+  },
+  nouser2:{
+    color:'#F76C6B',
+    fontSize:40,
+  },
+  nouserContainer:{
+    width:'100%',
+    height:'60%',
+    alignItems:'center',
+    justifyContent:'center',
   },
 });
 export default DisplayScreen;

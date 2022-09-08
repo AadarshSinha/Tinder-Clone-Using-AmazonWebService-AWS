@@ -10,17 +10,17 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableNativeFeedback,
-  Alert
+  Alert,
 } from 'react-native';
 import {Auth, DataStore, Storage} from 'aws-amplify';
-import {User} from './models/';
+import {User, Feedback} from './models/';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {S3Image} from 'aws-amplify-react-native';
 import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
-
+import FeedbackForm from './FeedbackForm';
 const ProfileScreen = () => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');
@@ -29,6 +29,8 @@ const ProfileScreen = () => {
   const [Uri, setUri] = useState('');
   const [user, setUser] = useState(null);
   const [isPick, setIsPick] = useState(false);
+  const [zoom, setZoom] = useState(false);
+  const [isFeedback, setIsFeedback] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -54,12 +56,6 @@ const ProfileScreen = () => {
     };
     getCurrentUser();
   }, []);
-  // useEffect(() => {
-  //   console.log('hello 1');
-  //   if (user === null) return;
-  //   console.log('hello 2');
-  //   setLoading(true);
-  // }, [user]);
   const check = () => {
     if (Name === '') return false;
     if (Age === '') return false;
@@ -96,12 +92,12 @@ const ProfileScreen = () => {
     console.log('Current User');
     console.log(user);
     let newImage;
-    if (isPick ) {
+    if (isPick) {
       newImage = await uploadImage();
       // DataStore.clear()
     }
     console.log('newImage = ' + newImage);
-    if (user.length===0) {
+    if (user.length === 0) {
       console.log('Adding new user data');
       const authUser = await Auth.currentAuthenticatedUser();
       const newUser = new User({
@@ -126,7 +122,7 @@ const ProfileScreen = () => {
       if (isPick) updated.image = newImage;
     });
     await DataStore.save(updatedUser);
-    Alert.alert("Updated Successful")
+    Alert.alert('Updated Successful');
     console.log('update successful');
   };
   const logOut = async () => {
@@ -134,9 +130,9 @@ const ProfileScreen = () => {
     try {
       await Auth.signOut();
       window.location.reload();
-  } catch (error) {
+    } catch (error) {
       console.log('error signing out: ', error);
-  }
+    }
   };
   const AddImage = () => {
     launchImageLibrary(
@@ -155,7 +151,7 @@ const ProfileScreen = () => {
   };
   const showImage = () => {
     if (Uri === '') {
-      return <FontAwesome name="user" size={130} color="grey" />;
+      return <FontAwesome name="user" size={300} color="grey" />;
     }
     if (isPick) {
       return <Image source={{uri: Uri}} style={styles.s3image} />;
@@ -163,54 +159,62 @@ const ProfileScreen = () => {
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${Uri}`;
     console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.s3image} />;
-
   };
 
+  if(isFeedback){
+    return <FeedbackForm setIsFeedback={setIsFeedback}/>
+  }
   return (
     <ScrollView style={styles.ProfileContainer}>
-        <View alignItems="center">
-          <Text style={styles.textt}>Profile Photo</Text>
-          {showImage()}
-          <Pressable onPress={AddImage}>
-            <Ionicons name="add-circle" size={35} color="#F76C6B" />
-          </Pressable>
-          <Text style={styles.textt}>Name</Text>
-          <TextInput style={styles.name} value={Name} onChangeText={setName} />
-          <Text style={styles.textt}>Age</Text>
-          <TextInput
-            style={styles.age}
-            value={Age}
-            onChangeText={setAge}
-            keyboardType="numeric"
-          />
-          <Text style={styles.textt}>Gender</Text>
+      <View alignItems="center">
+        <Text style={styles.textt}>Profile Photo</Text>
+        
+        {showImage()}
+        <Pressable onPress={AddImage}>
+          <Ionicons name="add-circle" size={35} color="#F76C6B" />
+        </Pressable>
+        <Text style={styles.textt}>Name</Text>
+        <TextInput style={styles.name} value={Name} onChangeText={setName} />
+        <Text style={styles.textt}>Age</Text>
+        <TextInput
+          style={styles.age}
+          value={Age}
+          onChangeText={setAge}
+          keyboardType="numeric"
+        />
+        <Text style={styles.textt}>Gender</Text>
 
-          <Picker
+        <Picker
           label="Gender"
           style={styles.gender}
-          
           selectedValue={Gender}
           onValueChange={itemValue => setGender(itemValue)}>
           <Picker.Item label="Male" value="MALE" />
           <Picker.Item label="Female" value="FEMALE" />
         </Picker>
-          <Text style={styles.textt}>Bio</Text>
-          <TextInput
-            style={styles.bio}
-            value={Bio}
-            onChangeText={setBio}
-            multiline
-            numberOfLines={3}
-          />
-          <View style={styles.profileFooter}>
-            <TouchableOpacity style={styles.button} onPress={Submit}>
-                <Text style={styles.text}>Submit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={logOut}>
-              <Text style={styles.text}>Log Out</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Text style={styles.textt}>Bio</Text>
+        <TextInput
+          style={styles.bio}
+          value={Bio}
+          onChangeText={setBio}
+          multiline
+          numberOfLines={3}
+        />
+        <TouchableOpacity style={styles.button} onPress={Submit}>
+          <Text style={styles.text}>Save Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setIsFeedback(!isFeedback)}>
+          <Text style={styles.text}>Feedback</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={logOut}>
+          <Text style={styles.text}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* <View style={styles.profileFooter}>
+          </View> */}
     </ScrollView>
   );
 };
@@ -225,8 +229,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: 30,
-    marginBottom: 30,
+    marginTop: 10,
+    marginBottom: 10,
   },
   s3image: {
     width: 300,
@@ -294,6 +298,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     elevation: 3,
     backgroundColor: '#F76C6B',
+    margin: 10,
   },
   text: {
     fontSize: 16,

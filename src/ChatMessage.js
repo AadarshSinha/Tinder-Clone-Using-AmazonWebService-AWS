@@ -1,50 +1,118 @@
-import { navItem } from "aws-amplify";
-import React from "react";
-import { View,Text, StyleSheet } from "react-native";
-import moment from "moment";
+import {navItem} from 'aws-amplify';
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import moment from 'moment';
 
-const ChatMessage = ({item,from,to}) => {
+const ChatMessage = ({item, from, to}) => {
   const isMyMessage = () => {
     return item.from === from.sub;
-  }
-  return(
-    <View style={[styles.container,{marginLeft:isMyMessage()?'27%':'3%'}]}>
-        <Text style={styles.content}>{item.message}</Text>
-        <Text style={styles.name}>{isMyMessage()?from.name:to.name}</Text>
-        <Text style={styles.time}>{moment(item.createdAt).fromNow()}</Text>
-    </View>
-  )
-}
-const styles=StyleSheet.create({
-    container:{
-        color:'black',
-        // height:200,
-        backgroundColor:'lightblue',
-        maxWidth:'70%',
-        marginBottom:10,
-        elevation:5,
-        borderRadius:20,
-        padding:10,
-        // margin:10,
-    },
-    content:{
-      color:'white',
-      fontSize:25,
-      fontWeight:'500'
-    },
-    name:{
-      color:'grey',
-      fontSize:15,
-      fontWeight:'500',
-      marginTop:10,
-    },
-    time:{
-      color:'grey',
-      fontSize:10,
-      bottom:10,
-      position:'absolute',
-      right:10,
-      marginTop:10,
-    }
-})
+  };
+  return (
+    <>
+      {isMyMessage() ? (
+
+          <View style={styles.container1}>
+            <Text style={styles.content1}>{item.message}</Text>
+            {/* <Text style={styles.name1}>
+              {isMyMessage() ? from.name : to.name}
+            </Text> */}
+            <Text style={styles.time1}>{moment(item.createdAt).fromNow()}</Text>
+          </View>
+      ) : (
+          <View style={styles.container2}>
+            <Text style={styles.content2}>{item.message}</Text>
+            {/* <Text style={styles.name2}>
+              {isMyMessage() ? from.name : to.name}
+            </Text> */}
+            <Text style={styles.time2}>{moment(item.createdAt).fromNow()}</Text>
+          </View>
+      )}
+    </>
+  );
+};
+const styles = StyleSheet.create({
+  container1: {
+    backgroundColor: 'lightblue',
+    maxWidth: '80%',
+    marginBottom: 10,
+    elevation: 5,
+    borderRadius: 20,
+    padding: 10,
+    alignSelf:'flex-end',
+    margin:10,
+    minWidth:'20%',
+    paddingBottom:30,
+  },
+  content1: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '500',
+    alignSelf:'flex-end'
+  },
+  time1: {
+    color: 'grey',
+    fontSize: 8,
+    bottom: 10,
+    position: 'absolute',
+    right: 10,
+    marginTop: 10,
+    // backgroundColor:'red',
+  },
+  container2: {
+    backgroundColor: 'lightblue',
+    maxWidth: '80%',
+    marginBottom: 10,
+    elevation: 5,
+    borderRadius: 20,
+    padding: 10,
+    alignSelf:'flex-start',
+    margin:10,
+    minWidth:'20%',
+    paddingBottom:30,
+  },
+  content2: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '500',
+    alignSelf:'flex-start'
+  },
+  time2: {
+    color: 'grey',
+    fontSize: 8,
+    bottom: 10,
+    left:10,
+    position: 'absolute',
+    
+    marginTop: 10,
+    alignSelf:'flex-start',
+    // backgroundColor:'red',
+  },
+});
 export default ChatMessage;
+
+// name2: {
+  //   width:'100%',
+  //   height:'100%',
+  //   color: 'grey',
+  //   fontSize: 15,
+  //   fontWeight: '500',
+  //   marginTop: 10,
+  //   position:'absolute',
+  //   top:0,
+  //   left:0,
+  //   overflow:'hidden',
+  //   alignSelf:'flex-end',
+  //   // backgroundColor:'green',
+  // },
+  // name1: {
+  //   // width:'100%',
+  //   height:'100%',
+  //   color: 'grey',
+  //   fontSize: 15,
+  //   fontWeight: '500',
+  //   marginTop: 10,
+  //   position:'absolute',
+  //   overflow:'hidden',
+  //   alignSelf:'flex-end',
+  //   right:10,
+  // },

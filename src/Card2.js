@@ -4,27 +4,30 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 
-export default function Card({ user }) {
+const Card2 = ({ user }) => {
   const [currentUser,setCurrentUser] = useState(null)
   const [bio,setBio] =useState(false)
-
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const dbUsers = await DataStore.query(User, u =>
-        u.sub('eq', user.user1),
+    console.log("running useEffect")
+    getCurrentUser();
+  }, [user]);
+  const getCurrentUser = async () => {
+    // const authUser = await Auth.currentAuthenticatedUser();
+    const dbUsers = await DataStore.query(User, u =>
+      u.sub('eq', user.user1),
       );
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }
-      setCurrentUser(dbUsers[0]);
-    };
-    getCurrentUser();
-  }, []);
+      console.log(dbUsers[0])
+    setCurrentUser(dbUsers[0]);
+  };
   const diasplayImage = () => {
     return <Image source={{uri: `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${currentUser.image}`}} style={styles.photo} />; 
   } 
-  if (currentUser === null) return;
+
+  if (currentUser === null) {
+    return};
   return (
     
     <View style={styles.CardContainer}>
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     bottom: 100,
     left: '5%',
     maxWidth:'90%',
-    paddingBottom:15,
+    paddingBottom:30,
   },
   textRow: {
     flexDirection: 'row',
@@ -93,3 +96,4 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
 })
+export default Card2;

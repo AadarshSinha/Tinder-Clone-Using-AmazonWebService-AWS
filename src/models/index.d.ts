@@ -4,6 +4,10 @@ import { ModelInit, MutableModel, PersistentModelConstructor } from "@aws-amplif
 
 
 
+type FeedbackMetaData = {
+  readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
 type BlockMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
@@ -26,6 +30,16 @@ type WaitlingListMetaData = {
 
 type UserMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
+export declare class Feedback {
+  readonly id: string;
+  readonly type: string;
+  readonly message: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  constructor(init: ModelInit<Feedback, FeedbackMetaData>);
+  static copyOf(source: Feedback, mutator: (draft: MutableModel<Feedback, FeedbackMetaData>) => MutableModel<Feedback, FeedbackMetaData> | void): Feedback;
 }
 
 export declare class Block {
