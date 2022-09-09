@@ -6,11 +6,15 @@ const DisplayMatches = ({sub, setLoverSub}) => {
   const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     const getCurrentUsers = async () => {
-      const dbUsers = await DataStore.query(User, u1 => u1.sub('eq', sub));
-      if (!dbUsers || dbUsers.length === 0) {
-        return;
+      try {
+        const dbUsers = await DataStore.query(User, u1 => u1.sub('eq', sub));
+        if (!dbUsers || dbUsers.length === 0) {
+          return;
+        }
+        setCurrentUser(dbUsers[0]);
+      } catch (error) {
+        Alert.alert(error.message);
       }
-      setCurrentUser(dbUsers[0]);
     };
     getCurrentUsers();
   }, []);

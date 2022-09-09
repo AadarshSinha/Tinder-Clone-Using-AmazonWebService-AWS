@@ -34,25 +34,29 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     const getCurrentUser = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
+      try {
+        const authUser = await Auth.currentAuthenticatedUser();
 
-      // console.log('sub = ', authUser.attributes.sub);
-      const dbUsers = await DataStore.query(User, u =>
-        u.sub('eq', authUser.attributes.sub),
-      );
-      console.log('dbusers ', dbUsers);
-      if (!dbUsers || dbUsers.length === 0) {
-        console.log('This is a new user');
-        return;
+        // console.log('sub = ', authUser.attributes.sub);
+        const dbUsers = await DataStore.query(User, u =>
+          u.sub('eq', authUser.attributes.sub),
+        );
+        console.log('dbusers ', dbUsers);
+        if (!dbUsers || dbUsers.length === 0) {
+          console.log('This is a new user');
+          return;
+        }
+        const dbUser = dbUsers[0];
+        // console.log('dbuser ', dbUser);
+        setUser(dbUser);
+        setName(dbUser.name);
+        setBio(dbUser.bio);
+        setGender(dbUser.gender);
+        setAge(dbUser.age);
+        setUri(dbUser.image);
+      } catch (error) {
+        Alert.alert(error.message);
       }
-      const dbUser = dbUsers[0];
-      // console.log('dbuser ', dbUser);
-      setUser(dbUser);
-      setName(dbUser.name);
-      setBio(dbUser.bio);
-      setGender(dbUser.gender);
-      setAge(dbUser.age);
-      setUri(dbUser.image);
     };
     getCurrentUser();
   }, []);
@@ -81,6 +85,7 @@ const ProfileScreen = () => {
       return key;
     } catch (e) {
       console.log(e);
+      Alert.alert(e.message);
     }
   };
   const Submit = async () => {
@@ -93,35 +98,47 @@ const ProfileScreen = () => {
     console.log(user);
     let newImage;
     if (isPick) {
-      newImage = await uploadImage();
+      try {
+        newImage = await uploadImage();
+      } catch (error) {
+        Alert.alert(error.message);
+      }
       // DataStore.clear()
     }
     console.log('newImage = ' + newImage);
     if (user.length === 0) {
       console.log('Adding new user data');
-      const authUser = await Auth.currentAuthenticatedUser();
-      const newUser = new User({
-        sub: authUser.attributes.sub,
-        name: Name,
-        bio: Bio,
-        gender: Gender,
-        age: Age,
-        image: newImage,
-      });
-      await DataStore.save(newUser);
+      try {
+        const authUser = await Auth.currentAuthenticatedUser();
+        const newUser = new User({
+          sub: authUser.attributes.sub,
+          name: Name,
+          bio: Bio,
+          gender: Gender,
+          age: Age,
+          image: newImage,
+        });
+        await DataStore.save(newUser);
+      } catch (error) {
+        Alert.alert(error.message);
+      }
       setUser(newUser);
       console.log('User added successful');
       return;
     }
     console.log('updating user data');
-    const updatedUser = User.copyOf(user, updated => {
-      updated.name = Name;
-      updated.bio = Bio;
-      updated.gender = Gender;
-      updated.age = Age;
-      if (isPick) updated.image = newImage;
-    });
-    await DataStore.save(updatedUser);
+    try {
+      const updatedUser = User.copyOf(user, updated => {
+        updated.name = Name;
+        updated.bio = Bio;
+        updated.gender = Gender;
+        updated.age = Age;
+        if (isPick) updated.image = newImage;
+      });
+      await DataStore.save(updatedUser);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
     Alert.alert('Updated Successful');
     console.log('update successful');
   };
@@ -161,14 +178,14 @@ const ProfileScreen = () => {
     return <Image source={{uri: url}} style={styles.s3image} />;
   };
 
-  if(isFeedback){
-    return <FeedbackForm setIsFeedback={setIsFeedback}/>
+  if (isFeedback) {
+    return <FeedbackForm setIsFeedback={setIsFeedback} />;
   }
   return (
     <ScrollView style={styles.ProfileContainer}>
       <View alignItems="center">
         <Text style={styles.textt}>Profile Photo</Text>
-        
+
         {showImage()}
         <Pressable onPress={AddImage}>
           <Ionicons name="add-circle" size={35} color="#F76C6B" />
@@ -212,7 +229,7 @@ const ProfileScreen = () => {
           <Text style={styles.text}>Log Out</Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* <View style={styles.profileFooter}>
           </View> */}
     </ScrollView>

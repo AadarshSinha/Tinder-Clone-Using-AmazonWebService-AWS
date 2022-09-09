@@ -15,13 +15,19 @@ const FeedbackForm = ({setIsFeedback}) => {
   const [type, setType] = useState('');
   const [msg, setMsg] = useState('');
   const submit = async () => {
+    if(msg===null || msg==='')return
+    try {
     const newFeed = new Feedback({
         type:type,
         message:msg
       });
       await DataStore.save(newFeed);
+      
       Alert.alert("Thank you for your feedback")
-    setIsFeedback(false);
+      setIsFeedback(false);
+    } catch (error) {
+      Alert.alert(error.message)
+    }
   };
   return (
     <>

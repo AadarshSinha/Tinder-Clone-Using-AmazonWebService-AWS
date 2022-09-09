@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf:'flex-end',
     margin:10,
-    minWidth:'20%',
+    minWidth:'22%',
     paddingBottom:30,
   },
   content1: {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf:'flex-start',
     margin:10,
-    minWidth:'20%',
+    minWidth:'22%',
     paddingBottom:30,
   },
   content2: {

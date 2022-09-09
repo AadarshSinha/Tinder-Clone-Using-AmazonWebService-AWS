@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity,Text, SafeAreaView} from 'react-native';
+import {View, StyleSheet, TouchableOpacity,Text, SafeAreaView,Alert} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card2 from './Card2';
@@ -15,6 +15,7 @@ const DisplayScreen = () => {
 
   useEffect(() => {
     const getCurrentUser = async () => {
+      try {
       const authUser = await Auth.currentAuthenticatedUser();
       const dbUsers = await DataStore.query(User, u =>
         u.sub('eq', authUser.attributes.sub),
@@ -23,10 +24,15 @@ const DisplayScreen = () => {
         return;
       }
       setCurrentUser(dbUsers[0]);
+      
+      } catch (error) {
+        Alert.alert(error.message)
+      }
     };
     getCurrentUser();
   }, []);
   const getDisplayUsers = async () => {
+    try {
     console.log(currentUser.sub);
     const dbUsers = await DataStore.query(WaitlingList, u =>
       u.user2('eq', currentUser.sub),
@@ -37,94 +43,173 @@ const DisplayScreen = () => {
     console.log(dbUsers);
     setUsers(dbUsers);
     setLoading(false);
+      
+    } catch (error) {
+      Alert.alert(error.message)
+    }
   };
   useEffect(() => {
     if (currentUser === null || currentUser.length === 0) return;
     getDisplayUsers();
   }, currentUser);
   const handleLike = async () => {
-    const checkExistingMatch = await DataStore.query(Matches, u1 =>
-      u1.or(u2 =>
-        u2
+    try {
+      const checkExistingMatch = await DataStore.query(Matches, u1 =>
+        u1.or(u2 =>
+          u2
           .and(u3 =>
-            u3.user1('eq', currentUser.sub).user2('eq', users[index].user1),
-          )
-          .and(u4 =>
-            u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
-          ),
-      ),
-    );
-    if (checkExistingMatch.length !== 0) {
-      console.log('user alredy matched');
-      setIndex((index + 1) % users.length);
+              u3.user1('eq', currentUser.sub).user2('eq', users[index].user1),
+            )
+            .and(u4 =>
+              u4.user1('eq', users[index].user1).user2('eq', currentUser.sub),
+              ),
+              ),
+              );
+              if (checkExistingMatch.length !== 0) {
+                console.log('user alredy matched');
+                setIndex((index + 1) % users.length);
+                return;
+              }
+            } catch (error) {
+              console.log("1")
+              Alert.alert(error.message);
+              return;
+    }
+    try {
+      const checkRepeat = await DataStore.query(WaitlingList, u =>
+        u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
+      );
+      if (checkRepeat.length !== 0) {
+        console.log('user alredy liked');
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      console.log("2")
+      Alert.alert(error.message);
       return;
     }
-    const checkRepeat = await DataStore.query(WaitlingList, u =>
-      u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
-    );
-    if (checkRepeat.length !== 0) {
-      console.log('user alredy liked');
-      setIndex((index + 1) % users.length);
-      return;
-    }
-    const checkMatch = await DataStore.query(WaitlingList, u =>
-      u.user1('eq', users[index].user1).user2('eq', currentUser.sub),
-    );
-    if (checkMatch.length === 0) {
-      const newWait = new WaitlingList({
-        user1: currentUser.sub,
-        user2: users[index].user1,
-      });
-      await DataStore.save(newWait);
-      console.log('No new matches');
-      setIndex((index + 1) % users.length);
+    try {
+      const checkMatch = await DataStore.query(WaitlingList, u =>
+        u.user1('eq', users[index].user1).user2('eq', currentUser.sub),
+      );
+      if (checkMatch.length === 0) {
+        try {
+          console.log(users)
+          const newWait = new WaitlingList({
+            user1: currentUser.sub,
+            user2: users[index].user1,
+          });
+          await DataStore.save(newWait);
+        } catch (error) {
+          console.log("3")
+          Alert.alert(error.message);
+          return;
+        }
+        console.log('no new matches');
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      console.log("4")
+
+      Alert.alert(error.message);
       return;
     }
     console.log('This is a new matches');
-    const newMatch = new Matches({
-      user1: currentUser.sub,
-      user2: users[index].user1,
-    });
-    await DataStore.save(newMatch);
-    await DataStore.delete(WaitlingList, u =>
-      u.user1('eq', users[index].user1).user2('eq', currentUser.sub),
-    );
+    try {
+      const newMatch = new Matches({
+        user1: currentUser.sub,
+        user2: users[index].user1,
+      });
+      await DataStore.save(newMatch);
+    } catch (error) {
+      console.log("5")
+
+      Alert.alert(error.message);
+      return;
+    }
+    try {
+      await DataStore.delete(WaitlingList, u =>
+        u.user1('eq', users[index].user1).user2('eq', currentUser.sub),
+      );
+    } catch (error) {
+      console.log("6")
+
+      Alert.alert(error.message);
+      return;
+    }
     setIndex((index + 1) % users.length);
   };
   const handleDislike = async () => {
     console.log('dislike');
-    // console.log(currentUser.sub, ' ', users[index].sub);
-    const checkExistingMatch = await DataStore.query(Matches, u1 =>
-      u1.or(u2 =>
-        u2
-          .and(u3 =>
-            u3.user1('eq', currentUser.sub).user2('eq', users[index].user1),
-          )
-          .and(u4 =>
-            u4.user1('eq', users[index].user1).user2('eq', currentUser.sub),
-          ),
-      ),
-    );
-    if (checkExistingMatch.length !== 0) {
-      console.log('user is matched , deleting it');
-      await DataStore.delete(Matches, u1 =>
-        u1.user2('eq', currentUser.sub).user1('eq', users[index].user1),
+    // console.log(currentUser.sub, ' ', users[index].user1);
+    try {
+      const checkExistingMatch = await DataStore.query(Matches, u1 =>
+        u1.or(u2 =>
+          u2
+            .and(u3 =>
+              u3.user1('eq', currentUser.sub).user2('eq', users[index].user1),
+            )
+            .and(u4 =>
+              u4.user1('eq', users[index].user1).user2('eq', currentUser.sub),
+            ),
+        ),
       );
-      await DataStore.delete(Matches, u =>
-        u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
-      );
-      console.log('creating new waiting');
-      const newWait = new WaitlingList({
-        user2: currentUser.sub,
-        user1: users[index].user1,
-      });
-      await DataStore.save(newWait);
-      setIndex((index + 1) % users.length);
+      if (checkExistingMatch.length !== 0) {
+        console.log('user is matched , deleting it');
+        try {
+          await DataStore.delete(Matches, u1 =>
+            u1.user2('eq', currentUser.sub).user1('eq', users[index].user1),
+          );
+        } catch (error) {
+          console.log("7")
+
+          Alert.alert(error.message);
+          return;
+        }
+        try {
+          await DataStore.delete(Matches, u =>
+            u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
+          );
+        } catch (error) {
+          console.log("8")
+
+          Alert.alert(error.message);
+          return;
+        }
+        console.log('creating new waiting');
+        try {
+          const newWait = new WaitlingList({
+            user2: currentUser.sub,
+            user1: users[index].user1,
+          });
+          await DataStore.save(newWait);
+        } catch (error) {
+          console.log("9")
+
+          Alert.alert(error.message);
+          return;
+        }
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      console.log("10")
+
+      Alert.alert(error.message);
       return;
     }
-    await DataStore.delete(WaitlingList, u =>
-      u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
-    );
+    try {
+      await DataStore.delete(WaitlingList, u =>
+        u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
+      );
+    } catch (error) {
+      console.log("11")
+
+      Alert.alert(error.message);
+      return;
+    }
     setIndex((index + 1) % users.length);
   };
   const handleSkip = () => {

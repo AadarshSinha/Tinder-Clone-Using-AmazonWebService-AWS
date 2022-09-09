@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity, SafeAreaView,Text} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  Text,
+} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card from './Card';
@@ -15,158 +21,224 @@ const DisplayScreen = () => {
 
   useEffect(() => {
     const getCurrentUser = async () => {
-      const authUser = await Auth.currentAuthenticatedUser();
-      const dbUsers = await DataStore.query(User, u =>
-        u.sub('eq', authUser.attributes.sub),
-      );
-      if (!dbUsers || dbUsers.length === 0) {
-        return;
+      try {
+        const authUser = await Auth.currentAuthenticatedUser();
+        const dbUsers = await DataStore.query(User, u =>
+          u.sub('eq', authUser.attributes.sub),
+        );
+        if (!dbUsers || dbUsers.length === 0) {
+          return;
+        }
+        setCurrentUser(dbUsers[0]);
+      } catch (error) {
+        Alert.alert(error.message);
       }
-      setCurrentUser(dbUsers[0]);
     };
     getCurrentUser();
   }, []);
   const getDisplayUsers = async () => {
-    const dbUsers = await DataStore.query(User, u =>
-      u.sub('ne', currentUser.sub).gender('ne', currentUser.gender),
-      {sort: s => s.createdAt()},
-    );
-    if (!dbUsers || dbUsers.length === 0) {
-      return;
+    try {
+      const dbUsers = await DataStore.query(
+        User,
+        u => u.sub('ne', currentUser.sub).gender('ne', currentUser.gender),
+        {sort: s => s.createdAt()},
+      );
+      if (!dbUsers || dbUsers.length === 0) {
+        return;
+      }
+      setUsers(dbUsers);
+      setLoading(false);
+    } catch (error) {
+      Alert.alert(error.message);
     }
-    setUsers(dbUsers);
-    setLoading(false);
   };
   useEffect(() => {
     if (currentUser === null || currentUser.length === 0) return;
     getDisplayUsers();
   }, currentUser);
   const handleLike = async () => {
-    const checkExistingMatch = await DataStore.query(Matches, u1 =>
-      u1.or(u2 =>
-        u2
-          .and(u3 =>
-            u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
-          )
-          .and(u4 =>
-            u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
-          ),
-      ),
-    );
-    if (checkExistingMatch.length !== 0) {
-      console.log('user alredy matched');
-      setIndex((index + 1) % users.length);
-      return;
-    }
-    const checkRepeat = await DataStore.query(WaitlingList, u =>
-      u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
-    );
-    if (checkRepeat.length !== 0) {
-      console.log('user alredy liked');
-      setIndex((index + 1) % users.length);
-      return;
-    }
-    const checkMatch = await DataStore.query(WaitlingList, u =>
-      u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
-    );
-    if (checkMatch.length === 0) {
-      const newWait = new WaitlingList({
-        user1: currentUser.sub,
-        user2: users[index].sub,
-      });
-      await DataStore.save(newWait);
-      console.log('no new matches');
-      setIndex((index + 1) % users.length);
-      return;
-    }
-    console.log('This is a new matches');
-    const newMatch = new Matches({
-      user1: currentUser.sub,
-      user2: users[index].sub,
-    });
-    await DataStore.save(newMatch);
-    await DataStore.delete(WaitlingList, u =>
-      u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
-      );
-      setIndex((index + 1) % users.length);
-    };
-    const handleDislike = async () => {
-      console.log('dislike');
-      // console.log(currentUser.sub, ' ', users[index].sub);
+    try {
       const checkExistingMatch = await DataStore.query(Matches, u1 =>
         u1.or(u2 =>
           u2
-          .and(u3 =>
-            u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+            .and(u3 =>
+              u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
             )
             .and(u4 =>
               u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
-          ),
-      ),
-    );
-    if (checkExistingMatch.length !== 0) {
-      console.log('user is matched , deleting it');
-      await DataStore.delete(Matches, u1 =>
-        u1.user2('eq', currentUser.sub).user1('eq', users[index].sub),
-        );
-        await DataStore.delete(Matches, u =>
-          u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+            ),
+        ),
+      );
+      if (checkExistingMatch.length !== 0) {
+        console.log('user alredy matched');
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    try {
+      const checkRepeat = await DataStore.query(WaitlingList, u =>
+        u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+      );
+      if (checkRepeat.length !== 0) {
+        console.log('user alredy liked');
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    try {
+      const checkMatch = await DataStore.query(WaitlingList, u =>
+        u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+      );
+      if (checkMatch.length === 0) {
+        try {
+          const newWait = new WaitlingList({
+            user1: currentUser.sub,
+            user2: users[index].sub,
+          });
+          await DataStore.save(newWait);
+        } catch (error) {
+          Alert.alert(error.message);
+          return;
+        }
+        console.log('no new matches');
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    console.log('This is a new matches');
+    try {
+      const newMatch = new Matches({
+        user1: currentUser.sub,
+        user2: users[index].sub,
+      });
+      await DataStore.save(newMatch);
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    try {
+      await DataStore.delete(WaitlingList, u =>
+        u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+      );
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    setIndex((index + 1) % users.length);
+  };
+  const handleDislike = async () => {
+    console.log('dislike');
+    // console.log(currentUser.sub, ' ', users[index].sub);
+    try {
+      const checkExistingMatch = await DataStore.query(Matches, u1 =>
+        u1.or(u2 =>
+          u2
+            .and(u3 =>
+              u3.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+            )
+            .and(u4 =>
+              u4.user1('eq', users[index].sub).user2('eq', currentUser.sub),
+            ),
+        ),
+      );
+      if (checkExistingMatch.length !== 0) {
+        console.log('user is matched , deleting it');
+        try {
+          await DataStore.delete(Matches, u1 =>
+            u1.user2('eq', currentUser.sub).user1('eq', users[index].sub),
           );
-          console.log("creating new waiting")
+        } catch (error) {
+          Alert.alert(error.message);
+          return;
+        }
+        try {
+          await DataStore.delete(Matches, u =>
+            u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+          );
+        } catch (error) {
+          Alert.alert(error.message);
+          return;
+        }
+        console.log('creating new waiting');
+        try {
           const newWait = new WaitlingList({
             user2: currentUser.sub,
             user1: users[index].sub,
           });
           await DataStore.save(newWait);
-          setIndex((index + 1) % users.length);
+        } catch (error) {
+          Alert.alert(error.message);
           return;
         }
-        await DataStore.delete(WaitlingList, u =>
-      u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
-    );
+        setIndex((index + 1) % users.length);
+        return;
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
+    try {
+      await DataStore.delete(WaitlingList, u =>
+        u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
+      );
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
     setIndex((index + 1) % users.length);
   };
   const handleSkip = () => {
     setIndex((index + 1) % users.length);
-  }
-  if(users===null||users.length===0){
+  };
+  if (users === null || users.length === 0) {
     return (
       <View style={styles.nouserContainer}>
         <Text style={styles.Title1}>Users Who Already Liked You</Text>
-         <Text style={styles.nouser1}>Opps..</Text>
-         <Text style={styles.nouser2}>No Users to Show</Text>
+        <Text style={styles.nouser1}>Opps..</Text>
+        <Text style={styles.nouser2}>No Users to Show</Text>
       </View>
-     ) 
+    );
   }
   return (
     <SafeAreaView style={styles.DisplayContainer}>
-      {!loading && <Card user={users[index]}/>}
-     {!loading && users.length!==0 && <View style={styles.bottomNavigation}>
-        <TouchableOpacity onPress={handleDislike}>
-          <Entypo
-            name="cross"
-            size={40}
-            color="#A65CD2"
-            style={styles.button}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSkip}>
-          <FontAwesome
-            name="refresh"
-            size={43}
-            color="#F6BE00"
-            style={styles.button1}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLike}>
-          <AntDesign
-            name="heart"
-            size={40}
-            color="#4FCC94"
-            style={styles.button}
-          />
-        </TouchableOpacity>
-      </View>}
+      {!loading && <Card user={users[index]} />}
+      {!loading && users.length !== 0 && (
+        <View style={styles.bottomNavigation}>
+          <TouchableOpacity onPress={handleDislike}>
+            <Entypo
+              name="cross"
+              size={40}
+              color="#A65CD2"
+              style={styles.button}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleSkip}>
+            <FontAwesome
+              name="refresh"
+              size={43}
+              color="#F6BE00"
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLike}>
+            <AntDesign
+              name="heart"
+              size={40}
+              color="#4FCC94"
+              style={styles.button}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -196,8 +268,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 50,
-    paddingLeft:12,
-
+    paddingLeft: 12,
   },
   DisplayContainer: {
     width: '100%',
@@ -205,29 +276,29 @@ const styles = StyleSheet.create({
     position: 'absolute',
     paddingTop: 80,
   },
-  Title1:{
-    width:'100%',
-    color:'#F76C6B',
-    fontSize:20,
-    fontWeight:'800',
-    textAlign:'center',
-    position:'absolute',
-    top:10,
+  Title1: {
+    width: '100%',
+    color: '#F76C6B',
+    fontSize: 20,
+    fontWeight: '800',
+    textAlign: 'center',
+    position: 'absolute',
+    top: 10,
   },
-  nouser1:{
-    color:'#F76C6B',
-    fontSize:80,
-    fontWeight:'800'
+  nouser1: {
+    color: '#F76C6B',
+    fontSize: 80,
+    fontWeight: '800',
   },
-  nouser2:{
-    color:'#F76C6B',
-    fontSize:40,
+  nouser2: {
+    color: '#F76C6B',
+    fontSize: 40,
   },
-  nouserContainer:{
-    width:'100%',
-    height:'60%',
-    alignItems:'center',
-    justifyContent:'center',
+  nouserContainer: {
+    width: '100%',
+    height: '60%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 export default DisplayScreen;
