@@ -21,7 +21,7 @@ import {S3Image} from 'aws-amplify-react-native';
 import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
 import FeedbackForm from './FeedbackForm';
-const ProfileScreen = () => {
+const ProfileScreen = ({setIsNew}) => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');
   const [Bio, setBio] = useState('');
@@ -41,9 +41,9 @@ const ProfileScreen = () => {
         const dbUsers = await DataStore.query(User, u =>
           u.sub('eq', authUser.attributes.sub),
         );
-        console.log('dbusers ', dbUsers);
         if (!dbUsers || dbUsers.length === 0) {
           console.log('This is a new user');
+          setUser([])
           return;
         }
         const dbUser = dbUsers[0];
@@ -55,7 +55,7 @@ const ProfileScreen = () => {
         setAge(dbUser.age);
         setUri(dbUser.image);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getCurrentUser();
@@ -91,7 +91,12 @@ const ProfileScreen = () => {
   const Submit = async () => {
     console.log('clicked submit');
     if (!check()) {
+      if(Uri===''){
+        Alert.alert("Add a Profile Photo")
+        return;
+      }
       console.log('Enter all details');
+      Alert.alert("Enter all details")
       return;
     }
     console.log('Current User');
@@ -101,7 +106,7 @@ const ProfileScreen = () => {
       try {
         newImage = await uploadImage();
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
       // DataStore.clear()
     }
@@ -119,12 +124,14 @@ const ProfileScreen = () => {
           image: newImage,
         });
         await DataStore.save(newUser);
+        setUser(newUser);
+        setIsNew(false)
+        Alert.alert('Updated Successful');
+        console.log('User added successful');
+        return;
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
-      setUser(newUser);
-      console.log('User added successful');
-      return;
     }
     console.log('updating user data');
     try {
@@ -137,19 +144,14 @@ const ProfileScreen = () => {
       });
       await DataStore.save(updatedUser);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
     Alert.alert('Updated Successful');
     console.log('update successful');
   };
   const logOut = async () => {
     await DataStore.clear();
-    try {
-      await Auth.signOut();
-      window.location.reload();
-    } catch (error) {
-      console.log('error signing out: ', error);
-    }
+    Auth.signOut();
   };
   const AddImage = () => {
     launchImageLibrary(
@@ -174,13 +176,14 @@ const ProfileScreen = () => {
       return <Image source={{uri: Uri}} style={styles.s3image} />;
     }
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${Uri}`;
-    console.log('url = ' + url);
+    // console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.s3image} />;
   };
 
   if (isFeedback) {
     return <FeedbackForm setIsFeedback={setIsFeedback} />;
   }
+  if(user===null)return
   return (
     <ScrollView style={styles.ProfileContainer}>
       <View alignItems="center">
@@ -200,14 +203,14 @@ const ProfileScreen = () => {
           keyboardType="numeric"
         />
         <Text style={styles.textt}>Gender</Text>
-
         <Picker
           label="Gender"
           style={styles.gender}
+
           selectedValue={Gender}
           onValueChange={itemValue => setGender(itemValue)}>
-          <Picker.Item label="Male" value="MALE" />
           <Picker.Item label="Female" value="FEMALE" />
+          <Picker.Item label="Male" value="MALE" />
         </Picker>
         <Text style={styles.textt}>Bio</Text>
         <TextInput

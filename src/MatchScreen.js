@@ -7,7 +7,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const DisplayScreen = () => {
+const MatchScreen = () => {
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
@@ -26,26 +26,24 @@ const DisplayScreen = () => {
       setCurrentUser(dbUsers[0]);
       
       } catch (error) {
-        Alert.alert(error.message)
+        Alert.alert("Error")
       }
     };
     getCurrentUser();
   }, []);
   const getDisplayUsers = async () => {
     try {
-    console.log(currentUser.sub);
     const dbUsers = await DataStore.query(WaitlingList, u =>
       u.user2('eq', currentUser.sub),
     );
     if (!dbUsers || dbUsers.length === 0) {
       return;
     }
-    console.log(dbUsers);
     setUsers(dbUsers);
     setLoading(false);
       
     } catch (error) {
-      Alert.alert(error.message)
+      Alert.alert("Error")
     }
   };
   useEffect(() => {
@@ -71,8 +69,7 @@ const DisplayScreen = () => {
                 return;
               }
             } catch (error) {
-              console.log("1")
-              Alert.alert(error.message);
+              Alert.alert("Error");
               return;
     }
     try {
@@ -85,8 +82,7 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      console.log("2")
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -102,8 +98,7 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          console.log("3")
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         console.log('no new matches');
@@ -111,9 +106,8 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      console.log("4")
 
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     console.log('This is a new matches');
@@ -124,9 +118,8 @@ const DisplayScreen = () => {
       });
       await DataStore.save(newMatch);
     } catch (error) {
-      console.log("5")
 
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -134,9 +127,8 @@ const DisplayScreen = () => {
         u.user1('eq', users[index].user1).user2('eq', currentUser.sub),
       );
     } catch (error) {
-      console.log("6")
 
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     setIndex((index + 1) % users.length);
@@ -163,9 +155,8 @@ const DisplayScreen = () => {
             u1.user2('eq', currentUser.sub).user1('eq', users[index].user1),
           );
         } catch (error) {
-          console.log("7")
 
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         try {
@@ -173,9 +164,8 @@ const DisplayScreen = () => {
             u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
           );
         } catch (error) {
-          console.log("8")
 
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         console.log('creating new waiting');
@@ -186,18 +176,16 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          console.log("9")
 
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         setIndex((index + 1) % users.length);
         return;
       }
     } catch (error) {
-      console.log("10")
 
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -205,9 +193,8 @@ const DisplayScreen = () => {
         u.user1('eq', currentUser.sub).user2('eq', users[index].user1),
       );
     } catch (error) {
-      console.log("11")
 
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     setIndex((index + 1) % users.length);
@@ -325,4 +312,4 @@ const styles = StyleSheet.create({
     justifyContent:'center',
   },
 });
-export default DisplayScreen;
+export default MatchScreen;

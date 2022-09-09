@@ -13,7 +13,7 @@ const DisplayMatches = ({sub, setLoverSub}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getCurrentUsers();

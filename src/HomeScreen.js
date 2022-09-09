@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {Text,View,StyleSheet,Pressable,ActivityIndicator} from 'react-native';
+import {Text,View,StyleSheet,Pressable,ActivityIndicator, Alert} from 'react-native';
 import DisplayScreen from './DisplayScreen'
 import MatchScreen from './MatchScreen'
 import ChatScreen from './ChatScreen'
@@ -7,24 +7,89 @@ import ProfileScreen from './ProfileScreen'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {Auth, DataStore,Hub, Storage} from 'aws-amplify';
+import {Amplify, Hub, Auth, DataStore} from 'aws-amplify';
 import {User} from './models/';
 
 const HomeScreen = () => {
-  const [screen,setScreen]=useState("chat");
+  const [screen,setScreen]=useState("display");
+  const [curUser,setCurUser] = useState(null);
+  const [isSync,setIsSync] =useState(false)
+  const [isNew,setIsNew] =useState(true)
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
-
+  const getCurrentUser = async () => {
+   // if(!isSync)return;
+   try {
+     const authUser = await Auth.currentAuthenticatedUser();
+     const dbUsers = await DataStore.query(User, u =>
+       u.sub('eq', authUser.attributes.sub),
+     );
+     if(isSync && dbUsers.length===0){
+      console.log("************************")
+      console.log("new user")
+      setCurUser([])
+      setScreen('profile')
+     }
+     if(!dbUsers || dbUsers.length===0)return;
+     setIsNew(false)
+     console.log(dbUsers)
+     setCurUser(dbUsers);
+   } catch (error) {
+     Alert.alert("Error");
+   }
+ };
+useEffect(() => {
+   const listener = data => {
+     if (data.payload.event === 'modelSynced'){
+      console.log("syncked")
+      setIsSync(true)
+       getCurrentUser();
+      }
+   };
+   Hub.listen('datastore', listener);
+   return () => Hub.remove('datastore', listener);
+}, []);
+console.log("user : ",curUser )
+if(curUser===null){
+     getCurrentUser();
+   return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  const handleDisplay = () =>{
+   if(isNew){
+      Alert.alert("Update your profile")
+      return;
+   }
+   setScreen("display")
+  }
+  const handleChat = () =>{
+   console.log("chat")
+   if(isNew){
+      Alert.alert("Update your profile")
+      return;
+   }
+   setScreen("chat")
+  }
+  const handleMatch = () =>{
+   if(isNew){
+      Alert.alert("Update your profile")
+      return;
+   }
+   setScreen("match")
+  }
   return(
     <View style={styles.Homescreen}>
       <View style={styles.topNavigation}>
-        <Pressable onPress={()=>{setScreen("display")}}>
+        <Pressable onPress={handleDisplay}>
            <Entypo name="home" size={35} color={screen==="display"?activeColor:defaultColor} />
         </Pressable>
-        <Pressable onPress={()=>{setScreen("match")}}>
+        <Pressable onPress={handleMatch}>
            <AntDesign name="star" size={35} color={screen==="match"?activeColor:defaultColor} />
         </Pressable>
-        <Pressable onPress={()=>{setScreen("chat")}}>
+        <Pressable onPress={handleChat}>
            <AntDesign name="wechat" size={35} color={screen==="chat"?activeColor:defaultColor} />
         </Pressable>
         <Pressable onPress={()=>{setScreen("profile")}}>
@@ -35,7 +100,7 @@ const HomeScreen = () => {
       {screen==="display" && <DisplayScreen/>}
       {screen==="match"  && <MatchScreen />}
       {screen==="chat" && <ChatScreen />}
-      {screen==="profile" &&  <ProfileScreen />}
+      {screen==="profile" &&  <ProfileScreen setIsNew={setIsNew} />}
     </View>
   );
 };

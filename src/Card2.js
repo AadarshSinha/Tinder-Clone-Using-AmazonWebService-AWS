@@ -21,7 +21,7 @@ const Card2 = ({user}) => {
       console.log(dbUsers[0]);
       setCurrentUser(dbUsers[0]);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   };
   const diasplayImage = () => {

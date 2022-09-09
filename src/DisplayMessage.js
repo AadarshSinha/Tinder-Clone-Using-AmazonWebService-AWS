@@ -18,7 +18,7 @@ const DisplayMessage = ({loverSub, setLoverSub, lastMessage, updated}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getCurrentUsers();

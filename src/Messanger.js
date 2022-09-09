@@ -51,7 +51,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       if (dbUsers[0].by === from) setBlockKiya(true);
       else setBlockHua(true);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   };
   useEffect(() => {
@@ -70,7 +70,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       return () => checkBlockUpdate.unsubscribe();
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   }, []);
   useEffect(() => {
@@ -86,7 +86,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       return () => checkBlockUpdate.unsubscribe();
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   }, []);
   useEffect(() => {
@@ -98,7 +98,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getCurrentUsers();
@@ -112,7 +112,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setLover(dbUsers[0]);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getLover();
@@ -138,7 +138,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       return () => subscription.unsubscribe();
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   }, []);
   useEffect(() => {
@@ -160,7 +160,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setChatContent(dbUsers);
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     };
     getMessages();
@@ -176,7 +176,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         await DataStore.save(temp);
         console.log('created new user');
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     } else {
       try {
@@ -195,7 +195,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         await DataStore.save(updatedUser);
         console.log('updated user');
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
     }
   };
@@ -225,7 +225,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       await DataStore.save(currentMsg);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
     setMsg('');
     console.log('Added new message');
@@ -239,7 +239,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         Alert.alert('User unblocked successfully');
         console.log('unblocked the user');
       } catch (error) {
-        Alert.alert(error.message);
+        Alert.alert("Error");
       }
       return;
     }
@@ -250,7 +250,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       await DataStore.save(newBlockuser);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
     Alert.alert('User blocked successfully');
     console.log('blocked the user');

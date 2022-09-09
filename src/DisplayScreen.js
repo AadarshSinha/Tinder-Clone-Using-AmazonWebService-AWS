@@ -19,21 +19,21 @@ const DisplayScreen = () => {
   const [index, setIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      try {
-        const authUser = await Auth.currentAuthenticatedUser();
-        const dbUsers = await DataStore.query(User, u =>
-          u.sub('eq', authUser.attributes.sub),
-        );
-        if (!dbUsers || dbUsers.length === 0) {
-          return;
-        }
-        setCurrentUser(dbUsers[0]);
-      } catch (error) {
-        Alert.alert(error.message);
+  const getCurrentUser = async () => {
+    try {
+      const authUser = await Auth.currentAuthenticatedUser();
+      const dbUsers = await DataStore.query(User, u =>
+        u.sub('eq', authUser.attributes.sub),
+      );
+      if (!dbUsers || dbUsers.length === 0) {
+        return;
       }
-    };
+      setCurrentUser(dbUsers[0]);
+    } catch (error) {
+      Alert.alert("Error");
+    }
+  };
+  useEffect(() => {
     getCurrentUser();
   }, []);
   const getDisplayUsers = async () => {
@@ -49,7 +49,7 @@ const DisplayScreen = () => {
       setUsers(dbUsers);
       setLoading(false);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   };
   useEffect(() => {
@@ -75,7 +75,7 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -88,7 +88,7 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -103,7 +103,7 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         console.log('no new matches');
@@ -111,7 +111,7 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     console.log('This is a new matches');
@@ -122,7 +122,7 @@ const DisplayScreen = () => {
       });
       await DataStore.save(newMatch);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -130,7 +130,7 @@ const DisplayScreen = () => {
         u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
       );
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     setIndex((index + 1) % users.length);
@@ -157,7 +157,7 @@ const DisplayScreen = () => {
             u1.user2('eq', currentUser.sub).user1('eq', users[index].sub),
           );
         } catch (error) {
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         try {
@@ -165,7 +165,7 @@ const DisplayScreen = () => {
             u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
           );
         } catch (error) {
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         console.log('creating new waiting');
@@ -176,14 +176,14 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          Alert.alert(error.message);
+          Alert.alert("Error");
           return;
         }
         setIndex((index + 1) % users.length);
         return;
       }
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     try {
@@ -191,7 +191,7 @@ const DisplayScreen = () => {
         u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
       );
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
       return;
     }
     setIndex((index + 1) % users.length);

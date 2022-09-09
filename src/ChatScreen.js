@@ -29,7 +29,7 @@ const ChatScreen = () => {
       }
       setMatches(dbUsers);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   };
   const getChatUsers = async () => {
@@ -51,7 +51,7 @@ const ChatScreen = () => {
       }
       setChats(dbUsers);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   };
   useEffect(() => {
@@ -72,7 +72,7 @@ const ChatScreen = () => {
       });
       return () => subscription.unsubscribe();
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error");
     }
   }, []);
   useEffect(() => {

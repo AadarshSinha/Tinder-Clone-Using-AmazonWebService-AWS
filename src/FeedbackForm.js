@@ -26,7 +26,7 @@ const FeedbackForm = ({setIsFeedback}) => {
       Alert.alert("Thank you for your feedback")
       setIsFeedback(false);
     } catch (error) {
-      Alert.alert(error.message)
+      Alert.alert("Error")
     }
   };
   return (
