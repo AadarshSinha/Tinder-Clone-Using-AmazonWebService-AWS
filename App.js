@@ -9,7 +9,7 @@ import {
   clearInterval,
   View,
 } from 'react-native';
-
+import SplashScreen from 'react-native-splash-screen'
 import {Amplify, Hub, Auth, DataStore} from 'aws-amplify';
 import awsconfig from './src/aws-exports';
 import {withAuthenticator} from 'aws-amplify-react-native';
@@ -35,6 +35,7 @@ const App = () => {
       setCurUser(null);
     }
   };
+  useEffect(()=>{SplashScreen.hide();},[])
   useEffect(() => {
     checkUser();
   }, []);

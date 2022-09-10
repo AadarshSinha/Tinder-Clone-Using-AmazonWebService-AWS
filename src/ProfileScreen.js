@@ -22,7 +22,7 @@ import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
 import FeedbackForm from './FeedbackForm';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-const reducer = require('image-blob-reduce')();
+
 
 const ProfileScreen = ({setIsNew}) => {
   const [Name, setName] = useState('');
@@ -76,8 +76,6 @@ const ProfileScreen = ({setIsNew}) => {
     try {
       const response = await fetch(Uri);
       const Blob = await response.blob();
-
-      reducer.toBlob(Blob,Blob.type,0.5).then(blob=>{Blob=blob})
 
       const urlParts = Uri.split('.');
       const extension = urlParts[urlParts.length - 1];

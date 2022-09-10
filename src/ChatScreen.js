@@ -109,7 +109,7 @@ const ChatScreen = () => {
       </ScrollView>
       {
         matches.length===0  &&
-          <Text style={styles.nomatch}>If two users like💚  each other then they will be matched and can send message</Text>
+          <Text style={styles.nomatch}>If two users like💚  each other then they will be matched and can send messages</Text>
       }
       <Text style={styles.head}>Messages</Text>
       <ScrollView style={styles.message} horizontal={false}>
