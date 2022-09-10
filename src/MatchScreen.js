@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity,Text, SafeAreaView,Alert} from 'react-native';
+import {View, StyleSheet, TouchableOpacity,Text, SafeAreaView,Alert,ActivityIndicator} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import Card2 from './Card2';
@@ -36,11 +36,13 @@ const MatchScreen = () => {
     const dbUsers = await DataStore.query(WaitlingList, u =>
       u.user2('eq', currentUser.sub),
     );
-    if (!dbUsers || dbUsers.length === 0) {
+    if (!dbUsers ) {
       return;
     }
+
+      setLoading(false);
+
     setUsers(dbUsers);
-    setLoading(false);
       
     } catch (error) {
       Alert.alert("Error")
@@ -201,6 +203,13 @@ const MatchScreen = () => {
   };
   const handleSkip = () => {
     setIndex((index + 1) % users.length);
+  }
+  if(loading){
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
   }
   if(users===null || users.length===0 ){
    return (

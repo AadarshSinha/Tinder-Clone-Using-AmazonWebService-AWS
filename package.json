@@ -12,16 +12,20 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-community/netinfo": "^9.3.0",
+    "@react-native-masked-view/masked-view": "^0.2.7",
     "@react-native-picker/picker": "^2.4.4",
     "amazon-cognito-identity-js": "^5.2.10",
     "aws-amplify": "^4.3.33",
     "aws-amplify-react-native": "^6.0.5",
+    "image-blob-reduce": "^4.1.0",
     "moment": "^2.29.4",
     "react": "18.0.0",
     "react-dom": "^18.2.0",
     "react-native": "0.69.4",
     "react-native-aws3": "^0.0.9",
     "react-native-image-picker": "^4.10.0",
+    "react-native-linear-gradient": "^2.6.2",
+    "react-native-skeleton-placeholder": "^5.0.0",
     "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {

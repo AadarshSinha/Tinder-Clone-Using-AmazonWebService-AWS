@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
@@ -199,6 +200,13 @@ const DisplayScreen = () => {
   const handleSkip = () => {
     setIndex((index + 1) % users.length);
   };
+  if(loading){
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
   if (users === null || users.length === 0) {
     return (
       <View style={styles.nouserContainer}>

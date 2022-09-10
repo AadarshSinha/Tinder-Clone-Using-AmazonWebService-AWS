@@ -3,6 +3,7 @@ import {View, Image, StyleSheet, Text, Alert} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 const Card2 = ({user}) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -40,6 +41,9 @@ const Card2 = ({user}) => {
   }
   return (
     <View style={styles.CardContainer}>
+            <SkeletonPlaceholder style={styles.skeleton}>
+        <View style={styles.imageContainer}></View>
+      </SkeletonPlaceholder>
       {diasplayImage()}
       <View style={styles.textContainer}>
         <View style={styles.textRow}>
@@ -73,6 +77,16 @@ const Card2 = ({user}) => {
 };
 
 const styles = StyleSheet.create({
+  skeleton: {
+    position: 'absolute',
+  },
+  imageContainer: {
+    height: '98%',
+    resizeMode: 'cover',
+    borderRadius: 20,
+    minWidth:'94%',
+    top:15,
+  },
   abc: {
     maxWidth: '90%',
   },
@@ -90,9 +104,9 @@ const styles = StyleSheet.create({
   photo: {
     height: '95%',
     width: '94%',
-    backgroundColor: 'white',
     resizeMode: 'cover',
     borderRadius: 20,
+    position:'absolute',
   },
   textContainer: {
     position: 'absolute',

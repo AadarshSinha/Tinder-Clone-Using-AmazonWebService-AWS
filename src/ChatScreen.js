@@ -107,6 +107,10 @@ const ChatScreen = () => {
             />
           ))}
       </ScrollView>
+      {
+        matches.length===0  &&
+          <Text style={styles.nomatch}>If two users like💚  each other then they will be matched and can send message</Text>
+      }
       <Text style={styles.head}>Messages</Text>
       <ScrollView style={styles.message} horizontal={false}>
         {chats.length != 0 &&
@@ -124,6 +128,19 @@ const ChatScreen = () => {
   );
 };
 const styles = StyleSheet.create({
+  nomatch:{
+    color:'grey',
+    marginLeft:20,
+    fontSize:20,
+    top:40,
+    maxWidth:300,
+    position:'absolute',
+    // backgroundColor:'red',
+    alignContent:'center',
+    textAlign:'center',
+    alignSelf:'center',
+    height:80,
+  },
   container: {
     width: '100%',
     height: '90%',

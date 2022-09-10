@@ -11,16 +11,19 @@ import {
   TouchableOpacity,
   TouchableNativeFeedback,
   Alert,
+  ActivityIndicator
 } from 'react-native';
 import {Auth, DataStore, Storage} from 'aws-amplify';
 import {User, Feedback} from './models/';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {S3Image} from 'aws-amplify-react-native';
 import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
 import FeedbackForm from './FeedbackForm';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+const reducer = require('image-blob-reduce')();
+
 const ProfileScreen = ({setIsNew}) => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');
@@ -31,6 +34,7 @@ const ProfileScreen = ({setIsNew}) => {
   const [isPick, setIsPick] = useState(false);
   const [zoom, setZoom] = useState(false);
   const [isFeedback, setIsFeedback] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -43,7 +47,7 @@ const ProfileScreen = ({setIsNew}) => {
         );
         if (!dbUsers || dbUsers.length === 0) {
           console.log('This is a new user');
-          setUser([])
+          setUser([]);
           return;
         }
         const dbUser = dbUsers[0];
@@ -55,7 +59,7 @@ const ProfileScreen = ({setIsNew}) => {
         setAge(dbUser.age);
         setUri(dbUser.image);
       } catch (error) {
-        Alert.alert("Error");
+        Alert.alert('Error');
       }
     };
     getCurrentUser();
@@ -71,17 +75,21 @@ const ProfileScreen = ({setIsNew}) => {
   const uploadImage = async () => {
     try {
       const response = await fetch(Uri);
+      const Blob = await response.blob();
 
-      const blob = await response.blob();
+      reducer.toBlob(Blob,Blob.type,0.5).then(blob=>{Blob=blob})
 
       const urlParts = Uri.split('.');
       const extension = urlParts[urlParts.length - 1];
-
+      const unique=moment()
       const authUser = await Auth.currentAuthenticatedUser();
-      const key = `${authUser.attributes.sub}${moment()}.${extension}`;
+      const key = `${authUser.attributes.sub}/${unique}.${extension}`;
+      if(Blob.size>100000){
 
+      }
+      console.log(Blob)
+      await Storage.put(key, Blob);
       console.log('user added to s3 successfully');
-      await Storage.put(key, blob);
       return key;
     } catch (e) {
       console.log(e);
@@ -91,22 +99,24 @@ const ProfileScreen = ({setIsNew}) => {
   const Submit = async () => {
     console.log('clicked submit');
     if (!check()) {
-      if(Uri===''){
-        Alert.alert("Add a Profile Photo")
+      if (Uri === '') {
+        Alert.alert('Add a Profile Photo');
         return;
       }
       console.log('Enter all details');
-      Alert.alert("Enter all details")
+      Alert.alert('Enter all details');
       return;
     }
+    setIsUpdating(true)
     console.log('Current User');
     console.log(user);
-    let newImage;
+    let newImage=Uri;
     if (isPick) {
       try {
         newImage = await uploadImage();
       } catch (error) {
-        Alert.alert("Error");
+        console.log(error)
+        Alert.alert('Error');
       }
       // DataStore.clear()
     }
@@ -125,13 +135,15 @@ const ProfileScreen = ({setIsNew}) => {
         });
         await DataStore.save(newUser);
         setUser(newUser);
-        setIsNew(false)
-        Alert.alert('Updated Successful');
+        setIsNew(false);
+        Alert.alert('Updated Successfully');
+        setIsUpdating(false)
         console.log('User added successful');
-        return;
       } catch (error) {
-        Alert.alert("Error");
+        console.log(error)
+        Alert.alert('Error');
       }
+      return;
     }
     console.log('updating user data');
     try {
@@ -140,17 +152,20 @@ const ProfileScreen = ({setIsNew}) => {
         updated.bio = Bio;
         updated.gender = Gender;
         updated.age = Age;
-        if (isPick) updated.image = newImage;
+        updated.image = newImage;
       });
       await DataStore.save(updatedUser);
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error)
+      Alert.alert('Error');
+      return
     }
-    Alert.alert('Updated Successful');
+    Alert.alert('Updated Successfully');
+    setIsUpdating(false)
     console.log('update successful');
   };
   const logOut = async () => {
-    await DataStore.clear();
+    // await DataStore.clear();
     Auth.signOut();
   };
   const AddImage = () => {
@@ -183,12 +198,20 @@ const ProfileScreen = ({setIsNew}) => {
   if (isFeedback) {
     return <FeedbackForm setIsFeedback={setIsFeedback} />;
   }
-  if(user===null)return
+  if (user === null){
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
   return (
     <ScrollView style={styles.ProfileContainer}>
-      <View alignItems="center">
+      <View alignItems="center" style={{width: '100%', height: '100%'}}>
         <Text style={styles.textt}>Profile Photo</Text>
-
+        <SkeletonPlaceholder style={styles.skeleton}>
+          <View style={styles.imageContainer}></View>
+        </SkeletonPlaceholder>
         {showImage()}
         <Pressable onPress={AddImage}>
           <Ionicons name="add-circle" size={35} color="#F76C6B" />
@@ -206,7 +229,6 @@ const ProfileScreen = ({setIsNew}) => {
         <Picker
           label="Gender"
           style={styles.gender}
-
           selectedValue={Gender}
           onValueChange={itemValue => setGender(itemValue)}>
           <Picker.Item label="Female" value="FEMALE" />
@@ -221,7 +243,7 @@ const ProfileScreen = ({setIsNew}) => {
           numberOfLines={3}
         />
         <TouchableOpacity style={styles.button} onPress={Submit}>
-          <Text style={styles.text}>Save Profile</Text>
+          <Text style={styles.text}>{isUpdating ? "Saving..." :"Save Profile"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
@@ -240,6 +262,14 @@ const ProfileScreen = ({setIsNew}) => {
 };
 
 const styles = StyleSheet.create({
+  skeleton:{
+    position:'relative',
+  },
+  imageContainer: {
+    height: 300,
+    width: 300,
+    borderRadius: 150,
+  },
   ProfileContainer: {
     backgroundColor: 'white',
     width: '100%',
@@ -258,6 +288,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 1,
     borderRadius: 150,
+    position:'absolute',
+    top:50,
   },
   name: {
     width: '92%',

@@ -3229,6 +3229,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-9.3.0.tgz#9792c23341eab5c629566baee016146f4f3f6086"
   integrity sha512-NNdMeIXXqmPCbXrWxVqRzZ1gEZ6L1ykotWnCZLVjQBUgjyGWdL5LiDM/bcIa5DLzqZY7Km08rMgB7BoHUuEmnQ==
 
+"@react-native-masked-view/masked-view@^0.2.7":
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.2.7.tgz#d19f1fc646df9440c23c834b4ff3f2b8fe15e175"
+  integrity sha512-ME+egr2l25rkcIJjFoXQUWWlfkJMY2KHdhf/df2ZXbVdVx5HIeTPpJpjKTZOPttLFtmrtHpzsqK1/dmu8F755g==
+
 "@react-native-picker/picker@^2.4.4":
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-2.4.4.tgz#4e4d2ec4b040e24d8b99c6be8f8b3201bb29fad3"
@@ -5296,6 +5301,11 @@ globals@^13.6.0, globals@^13.9.0:
   dependencies:
     type-fest "^0.20.2"
 
+glur@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/glur/-/glur-1.1.2.tgz#f20ea36db103bfc292343921f1f91e83c3467689"
+  integrity sha512-l+8esYHTKOx2G/Aao4lEQ0bnHWg4fWtJbVoZZT9Knxi01pB8C80BR85nONLFwkkQoFRCmXY+BUcGZN3yZ2QsRA==
+
 graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.4, graceful-fs@^4.2.9:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
@@ -5483,6 +5493,13 @@ ignore@^5.0.5:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
+
+image-blob-reduce@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/image-blob-reduce/-/image-blob-reduce-4.1.0.tgz#45f1e146ceaa45079025febe307f9b1e8b6833c9"
+  integrity sha512-iljleP8Fr7tS1ezrAazWi30abNPYXtBGXb9R9oTZDWObqiKq18AQJGTUb0wkBOtdCZ36/IirkuuAIIHTjBJIjA==
+  dependencies:
+    pica "^9.0.0"
 
 image-size@^0.6.0:
   version "0.6.3"
@@ -7037,6 +7054,14 @@ ms@2.1.3:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
+multimath@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/multimath/-/multimath-2.0.0.tgz#0d37acf67c328f30e3d8c6b0d3209e6082710302"
+  integrity sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==
+  dependencies:
+    glur "^1.1.2"
+    object-assign "^4.1.1"
+
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -7463,6 +7488,16 @@ path-parse@^1.0.7:
   resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
+pica@^9.0.0:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/pica/-/pica-9.0.1.tgz#9ba5a5e81fc09dca9800abef9fb8388434b18b2f"
+  integrity sha512-v0U4vY6Z3ztz9b4jBIhCD3WYoecGXCQeCsYep+sXRefViL+mVVoTL+wqzdPeE+GpBFsRUtQZb6dltvAt2UkMtQ==
+  dependencies:
+    glur "^1.1.2"
+    multimath "^2.0.0"
+    object-assign "^4.1.1"
+    webworkify "^1.5.0"
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
@@ -7684,6 +7719,16 @@ react-native-image-picker@^4.10.0:
   version "4.10.0"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-4.10.0.tgz#471ca942bd1189134eff63e25903147f54aeb8c2"
   integrity sha512-QNK4ZnFLD+BdiM1QL1jh9GUALhRXm3MV97crhnTCSMv50H6E4tq3ozgfyxF5uKz0cECbNkWswg4sjgqZKEJtww==
+
+react-native-linear-gradient@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.6.2.tgz#56598a76832724b2afa7889747635b5c80948f38"
+  integrity sha512-Z8Xxvupsex+9BBFoSYS87bilNPWcRfRsGC0cpJk72Nxb5p2nEkGSBv73xZbEHnW2mUFvP+huYxrVvjZkr/gRjQ==
+
+react-native-skeleton-placeholder@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-skeleton-placeholder/-/react-native-skeleton-placeholder-5.0.0.tgz#899fca447c2f0b81f98566e350e792157a3c9df9"
+  integrity sha512-7sdG+Y2ENEVcxFC9XlpCgHy59XKkxaUyVqDwuAb66hvl7lwFr25uA5kHJ+JuDJ84ptVil5UEowW/2avwhsfoYg==
 
 react-native-vector-icons@^9.2.0:
   version "9.2.0"
@@ -8946,6 +8991,11 @@ webidl-conversions@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-6.1.0.tgz#9111b4d7ea80acd40f5270d666621afa78b69514"
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
+
+webworkify@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.5.0.tgz#734ad87a774de6ebdd546e1d3e027da5b8f4a42c"
+  integrity sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==
 
 whatwg-encoding@^1.0.5:
   version "1.0.5"
