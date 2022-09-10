@@ -47,6 +47,9 @@ const DisplayScreen = () => {
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }
+      const idx=Math.floor(Math.random() * dbUsers.length);
+      setIndex(idx)
+      console.log("idx = ",idx)
       setUsers(dbUsers);
       setLoading(false);
     } catch (error) {

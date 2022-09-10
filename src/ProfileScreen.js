@@ -23,7 +23,6 @@ import moment from 'moment';
 import FeedbackForm from './FeedbackForm';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
-
 const ProfileScreen = ({setIsNew}) => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');

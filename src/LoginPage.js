@@ -15,7 +15,9 @@ const LoginPage = ({setLoading}) => {
   const [password, setPassword] = useState('');
   const [otp, setOTP] = useState(0);
   const [screen, setScreen] = useState('signin');
+  const [action,setAction]=useState(false)
   const SignIn = async () => {
+    setAction(true)
     try {
       const response = await Auth.signIn(number, password);
       console.log(response);
@@ -31,10 +33,13 @@ const LoginPage = ({setLoading}) => {
           console.log(error)
         }
         setScreen('verifyNew')
+    setAction(false)
         return;
       }
       Alert.alert(e.message);
     }
+    setAction(false)
+
   };
   const resendOTP = async() => {
     try {
@@ -58,6 +63,7 @@ const LoginPage = ({setLoading}) => {
           try {
               const response = await Auth.confirmSignUp(number, otp);
               console.log(response);
+              
               setNumber('')
               setPassword('')
               setOTP(0)
@@ -120,7 +126,7 @@ const LoginPage = ({setLoading}) => {
             secureTextEntry={true}
           />
           <TouchableOpacity style={styles.button} onPress={SignIn}>
-            <Text style={styles.text}>Sign In</Text>
+            <Text style={styles.text}>{action?"Signing...":"Sign In"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
