@@ -9,19 +9,17 @@ const Card2 = ({user}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [bio, setBio] = useState(false);
   useEffect(() => {
-    console.log('running useEffect');
     getCurrentUser();
   }, [user]);
   const getCurrentUser = async () => {
-    // const authUser = await Auth.currentAuthenticatedUser();
     try {
       const dbUsers = await DataStore.query(User, u => u.sub('eq', user.user1));
       if (!dbUsers || dbUsers.length === 0) {
         return;
       }
-      console.log(dbUsers[0]);
       setCurrentUser(dbUsers[0]);
     } catch (error) {
+      console.log(error.message)
       Alert.alert("Error");
     }
   };
@@ -114,10 +112,13 @@ const styles = StyleSheet.create({
     left: '5%',
     maxWidth: '90%',
     paddingBottom: 30,
+    maxWidth:350,
   },
   textRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    maxWidth:350,
+
   },
   textPrimary: {
     color: 'white',

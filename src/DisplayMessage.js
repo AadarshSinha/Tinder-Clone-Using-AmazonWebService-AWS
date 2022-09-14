@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Image, Text, Pressable} from 'react-native';
+import {StyleSheet, View, Image, Text, Pressable,Alert} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches} from './models';
 import moment from 'moment';
@@ -18,6 +18,7 @@ const DisplayMessage = ({loverSub, setLoverSub, lastMessage, updated}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
+      console.log(error.message)
         Alert.alert("Error");
       }
     };
@@ -45,7 +46,7 @@ const DisplayMessage = ({loverSub, setLoverSub, lastMessage, updated}) => {
 const styles = StyleSheet.create({
   container: {
     width: '95%',
-    height: 100,
+    height: 80,
     marginTop: 10,
     flexDirection: 'row',
     marginLeft: 10,
@@ -55,32 +56,37 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 0,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 50,
     position: 'relative',
   },
   text1: {
-    fontSize: 30,
+    fontSize: 22,
     position: 'absolute',
     color: 'white',
     fontWeight: '800',
-    left: 120,
+    left: 100,
     top: 10,
     fontFamily: 'Open Sans',
-    width: 200,
+    width: '65%',
     overflow: 'hidden',
-    height: 50,
+    height: 40,
+    // backgroundColor:'red',
   },
   text2: {
+    // backgroundColor:'red',
+    width:'40%',
+    height:20,
     position: 'absolute',
-    top: 60,
+    top: 50,
     color: 'white',
-    left: 120,
+    left: 100,
+    overflow:'hidden',
   },
   text3: {
     position: 'absolute',
-    top: 60,
+    top: 55,
     color: 'white',
     right: 10,
   },

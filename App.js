@@ -25,6 +25,7 @@ Amplify.configure({
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [curUser, setCurUser] = useState(undefined);
+  const [sync,setSync]=useState(false)
   const checkUser = async () => {
     try {
       const authUser = await Auth.currentAuthenticatedUser({
@@ -43,6 +44,7 @@ const App = () => {
     const listener = data => {
       if (data.payload.event === 'signIn' || data.payload.event === 'signOut'){
         checkUser();
+        if(data.payload.event === 'signOut')setSync(true);
       }
     };
     Hub.listen('auth', listener);
@@ -58,7 +60,7 @@ const App = () => {
   return (
     <SafeAreaView style={style.home}>
       {curUser ? (
-        <HomeScreen />
+        <HomeScreen sync={sync} />
       ) : (
         <LoginPage setLoading={setLoading} />
       )}

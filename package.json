@@ -21,12 +21,14 @@
     "moment": "^2.29.4",
     "react": "18.0.0",
     "react-dom": "^18.2.0",
+    "react-image-file-resizer": "^0.4.8",
     "react-native": "0.69.4",
     "react-native-aws3": "^0.0.9",
     "react-native-image-picker": "^4.10.0",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-skeleton-placeholder": "^5.0.0",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-swipe-gestures": "^1.0.5",
     "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {

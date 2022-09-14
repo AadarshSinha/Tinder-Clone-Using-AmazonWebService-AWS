@@ -12,7 +12,7 @@ import {
 import {Picker} from '@react-native-picker/picker';
 
 const FeedbackForm = ({setIsFeedback}) => {
-  const [type, setType] = useState('');
+  const [type, setType] = useState('BUG');
   const [msg, setMsg] = useState('');
   const submit = async () => {
     if(msg===null || msg==='')return
@@ -40,7 +40,7 @@ const FeedbackForm = ({setIsFeedback}) => {
           onValueChange={itemValue => setType(itemValue)}>
           <Picker.Item label="Report a bug" value="BUG" />
           <Picker.Item label="Feedback" value="FEEDBACK" />
-          <Picker.Item label="Need Help" value="HELP" />
+          <Picker.Item label="New Features" value="FEATURE" />
         </Picker>
         <Text style={styles.textt}>Context</Text>
         <TextInput

@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {Text,View,StyleSheet,Pressable,ActivityIndicator, Alert} from 'react-native';
+import {Text,View,StyleSheet,Pressable,ActivityIndicator, Alert,BackHandler} from 'react-native';
 import DisplayScreen from './DisplayScreen'
 import MatchScreen from './MatchScreen'
 import ChatScreen from './ChatScreen'
@@ -7,16 +7,19 @@ import ProfileScreen from './ProfileScreen'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {Amplify, Hub, Auth, DataStore} from 'aws-amplify';
+import {Amplify, Hub, Auth, DataStore, sceneActions} from 'aws-amplify';
 import {User} from './models/';
 
-const HomeScreen = () => {
+const HomeScreen = ({sync}) => {
   const [screen,setScreen]=useState("display");
   const [curUser,setCurUser] = useState(null);
   const [isSync,setIsSync] =useState(false)
   const [isNew,setIsNew] =useState(true)
+  
   const defaultColor="#b5b5b5"
   const activeColor = '#F76C6B';
+
+  
   const getCurrentUser = async () => {
    // if(!isSync)return;
    try {
@@ -24,24 +27,21 @@ const HomeScreen = () => {
      const dbUsers = await DataStore.query(User, u =>
        u.sub('eq', authUser.attributes.sub),
      );
-     if(isSync && dbUsers.length===0){
-      console.log("************************")
-      console.log("new user")
+     if((isSync||sync) && dbUsers.length===0){
       setCurUser([])
       setScreen('profile')
      }
      if(!dbUsers || dbUsers.length===0)return;
      setIsNew(false)
-     console.log(dbUsers)
      setCurUser(dbUsers);
    } catch (error) {
+    console.log(error.message)
      Alert.alert("Error");
    }
  };
 useEffect(() => {
    const listener = data => {
      if (data.payload.event === 'modelSynced'){
-      console.log("syncked")
       setIsSync(true)
        getCurrentUser();
       }
@@ -49,7 +49,7 @@ useEffect(() => {
    Hub.listen('datastore', listener);
    return () => Hub.remove('datastore', listener);
 }, []);
-console.log("user : ",curUser )
+
 if(curUser===null){
      getCurrentUser();
    return (
@@ -66,7 +66,6 @@ if(curUser===null){
    setScreen("display")
   }
   const handleChat = () =>{
-   console.log("chat")
    if(isNew){
       Alert.alert("Update your profile")
       return;
@@ -97,10 +96,10 @@ if(curUser===null){
         </Pressable>
       </View>
       
-      {screen==="display" && <DisplayScreen/>}
-      {screen==="match"  && <MatchScreen />}
-      {screen==="chat" && <ChatScreen />}
-      {screen==="profile" &&  <ProfileScreen setIsNew={setIsNew} />}
+      {screen==="display" && <DisplayScreen />}
+      {screen==="match"  && <MatchScreen setScreen={setScreen} />}
+      {screen==="chat" && <ChatScreen setScreen={setScreen}/> }
+      {screen==="profile" &&  <ProfileScreen setIsNew={setIsNew} setScreen={setScreen}/>}
     </View>
   );
 };

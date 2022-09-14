@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  BackHandler
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -33,6 +34,16 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
   const [blockKiya, setBlockKiya] = useState(false);
   const [blockHua, setBlockHua] = useState(false);
   const [drop, setDrop] = useState(false);
+
+
+  useEffect(() => {
+    const backAction = () => {
+      handleBack()
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress",backAction);
+    return () => backHandler.remove();
+  }, []);
   const checkBlock = async () => {
     try {
       const dbUsers = await DataStore.query(Block, u1 =>
@@ -51,7 +62,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       if (dbUsers[0].by === from) setBlockKiya(true);
       else setBlockHua(true);
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
   };
   useEffect(() => {
@@ -64,13 +76,13 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       }).subscribe({
         next: data => {
           const newMsg = data.value.data.onDeleteBlock;
-          console.log('newMsg = ', newMsg);
           checkBlock();
         },
       });
       return () => checkBlockUpdate.unsubscribe();
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
   }, []);
   useEffect(() => {
@@ -86,7 +98,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       return () => checkBlockUpdate.unsubscribe();
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
   }, []);
   useEffect(() => {
@@ -98,7 +111,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
     };
     getCurrentUsers();
@@ -112,7 +126,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setLover(dbUsers[0]);
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
     };
     getLover();
@@ -138,7 +153,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       return () => subscription.unsubscribe();
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
   }, []);
   useEffect(() => {
@@ -160,7 +176,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         }
         setChatContent(dbUsers);
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
     };
     getMessages();
@@ -176,7 +193,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         await DataStore.save(temp);
         console.log('created new user');
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
     } else {
       try {
@@ -195,7 +213,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         await DataStore.save(updatedUser);
         console.log('updated user');
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
     }
   };
@@ -225,7 +244,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       await DataStore.save(currentMsg);
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
     setMsg('');
     console.log('Added new message');
@@ -239,7 +259,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         Alert.alert('User unblocked successfully');
         console.log('unblocked the user');
       } catch (error) {
-        Alert.alert("Error");
+      console.log(error.message)
+        Alert.alert('Error');
       }
       return;
     }
@@ -250,7 +271,8 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
       });
       await DataStore.save(newBlockuser);
     } catch (error) {
-      Alert.alert("Error");
+      console.log(error.message)
+      Alert.alert('Error');
     }
     Alert.alert('User blocked successfully');
     console.log('blocked the user');
@@ -258,26 +280,27 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
   if (lover === null) return;
   return (
     <View style={styles.container}>
+      
       <View style={styles.navbar}>
+        
         <Pressable onPress={handleBack} style={styles.back}>
           <Ionicons name="chevron-back-outline" size={50} color="white" />
         </Pressable>
         {display()}
+
         <Text style={styles.namee}>{lover.name}</Text>
+        {drop && (
+          <TouchableOpacity onPress={handleBlock} style={styles.optionContainer}>
+          {blockKiya && <Text style={styles.block}>Unblock</Text>}
+          {!blockHua && !blockKiya && <Text style={styles.block}>Block</Text>}
+        </TouchableOpacity>
+      )}
         <Pressable onPress={() => setDrop(!drop)} style={styles.option}>
           <View style={styles.blockContainer}>
             <Fontisto name="more-v-a" size={30} color="white" />
           </View>
         </Pressable>
-        {/* <View style={styles.optionContainer}> */}
-        {drop && (
-          <TouchableOpacity
-            onPress={handleBlock}
-            style={styles.optionContainer}>
-            {blockKiya && <Text style={styles.block}>Unblock</Text>}
-            {!blockHua && !blockKiya && <Text style={styles.block}>Block</Text>}
-          </TouchableOpacity>
-        )}
+        
       </View>
       <FlatList
         data={chatContent}
@@ -287,6 +310,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         inverted
         style={styles.content}
       />
+
       {!blockHua && !blockKiya ? (
         <View style={styles.bottom}>
           <TextInput
@@ -299,14 +323,19 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
             placeholderTextColor="grey"
           />
           <Pressable onPress={handleSend}>
-            <Ionicons name="send" size={50} color="white" />
+            <Ionicons name="send" size={40} color="white" />
           </Pressable>
         </View>
       ) : (
         <View>
-          <Text style={styles.warning}>You can not message this user</Text>
+          <Text style={styles.warning}>
+            {blockHua
+              ? 'You have been blocked by the user'
+              : 'You have blocked this user'}
+          </Text>
         </View>
       )}
+
     </View>
   );
 };
@@ -328,13 +357,13 @@ const styles = StyleSheet.create({
   },
   block: {
     backgroundColor: 'orange',
-    position: 'absolute',
-    right: 0,
     color: 'white',
     fontSize: 20,
     padding: 10,
     borderRadius: 10,
     fontWeight: '500',
+    position: 'absolute',
+    right:0,
   },
   option: {
     right: 25,

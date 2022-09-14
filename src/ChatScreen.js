@@ -1,18 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, ScrollView, StyleSheet, Text, View,BackHandler,Alert} from 'react-native';
 import {Auth, DataStore, API} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
 import DisplayMatches from './DisplayMatches';
 import DisplayMessage from './DisplayMessage';
 import Messanger from './Messanger';
-import {onUpdateChatUsers} from './models/schema';
+import {onUpdateChatUsers,onCreateChatUsers} from './models/schema';
 
-const ChatScreen = () => {
+const ChatScreen = ({setScreen}) => {
   const [matches, setMatches] = useState([]);
   const [chats, setChats] = useState([]);
   const [userSub, setUserSub] = useState(null);
   const [loverSub, setLoverSub] = useState(null);
   const [isChatting, setIsChatting] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      setScreen("display")
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress",backAction);
+    return () => backHandler.remove();
+  }, []);
   const getMatchedUsers = async () => {
     try {
       const authUser = await Auth.currentAuthenticatedUser();
@@ -29,6 +38,7 @@ const ChatScreen = () => {
       }
       setMatches(dbUsers);
     } catch (error) {
+      console.log(error.message)
       Alert.alert("Error");
     }
   };
@@ -51,6 +61,7 @@ const ChatScreen = () => {
       }
       setChats(dbUsers);
     } catch (error) {
+      console.log(error.message)
       Alert.alert("Error");
     }
   };
@@ -72,6 +83,29 @@ const ChatScreen = () => {
       });
       return () => subscription.unsubscribe();
     } catch (error) {
+      console.log(error.message)
+      Alert.alert("Error");
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      const subscription = API.graphql({
+        query: onCreateChatUsers,
+      }).subscribe({
+        next: data => {
+          const newMsg = data.value.data.onCreateChatUsers;
+          if (
+            newMsg.from === userSub ||
+            newMsg.to === userSub ||
+            userSub === null
+          ) {
+            getChatUsers();
+          }
+        },
+      });
+      return () => subscription.unsubscribe();
+    } catch (error) {
+      console.log(error.message)
       Alert.alert("Error");
     }
   }, []);
@@ -81,7 +115,6 @@ const ChatScreen = () => {
   }, []);
   useEffect(() => {
     if (loverSub == null) return;
-    console.log('you click on your lover ', loverSub);
     setIsChatting(true);
   }, loverSub);
   if (userSub === null) return;

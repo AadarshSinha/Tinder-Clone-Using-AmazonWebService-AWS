@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,9 @@ import {
   SafeAreaView,
   Text,
   ActivityIndicator,
+  Image,
+  BackHandler,
+  Alert,
 } from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches, ChatUsers} from './models';
@@ -13,13 +16,39 @@ import Card from './Card';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
 const DisplayScreen = () => {
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+  const [like, setLike] = useState(false);
+  const [dislike, setDislike] = useState(false);
+  const [skip, setSkip] = useState(false);
 
+  const config = {
+    velocityThreshold: 0.3,
+    directionalOffsetThreshold: 80,
+  };
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Hold on!', 'Are you sure you want to exit', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, []);
   const getCurrentUser = async () => {
     try {
       const authUser = await Auth.currentAuthenticatedUser();
@@ -31,7 +60,8 @@ const DisplayScreen = () => {
       }
       setCurrentUser(dbUsers[0]);
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
     }
   };
   useEffect(() => {
@@ -45,15 +75,16 @@ const DisplayScreen = () => {
         {sort: s => s.createdAt()},
       );
       if (!dbUsers || dbUsers.length === 0) {
+        setLoading(false);
         return;
       }
-      const idx=Math.floor(Math.random() * dbUsers.length);
-      setIndex(idx)
-      console.log("idx = ",idx)
+      const idx = Math.floor(Math.random() * dbUsers.length);
+      setIndex(idx);
       setUsers(dbUsers);
       setLoading(false);
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
     }
   };
   useEffect(() => {
@@ -61,6 +92,10 @@ const DisplayScreen = () => {
     getDisplayUsers();
   }, currentUser);
   const handleLike = async () => {
+    setLike(true);
+    setTimeout(() => {
+      setLike(false);
+    }, 200);
     try {
       const checkExistingMatch = await DataStore.query(Matches, u1 =>
         u1.or(u2 =>
@@ -79,7 +114,8 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     try {
@@ -92,7 +128,8 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     try {
@@ -107,7 +144,8 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          Alert.alert("Error");
+          console.log(error.message)
+          Alert.alert('Error');
           return;
         }
         console.log('no new matches');
@@ -115,7 +153,8 @@ const DisplayScreen = () => {
         return;
       }
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     console.log('This is a new matches');
@@ -126,7 +165,8 @@ const DisplayScreen = () => {
       });
       await DataStore.save(newMatch);
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     try {
@@ -134,14 +174,17 @@ const DisplayScreen = () => {
         u.user1('eq', users[index].sub).user2('eq', currentUser.sub),
       );
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     setIndex((index + 1) % users.length);
   };
   const handleDislike = async () => {
-    console.log('dislike');
-    // console.log(currentUser.sub, ' ', users[index].sub);
+    setDislike(true);
+    setTimeout(() => {
+      setDislike(false);
+    }, 200);
     try {
       const checkExistingMatch = await DataStore.query(Matches, u1 =>
         u1.or(u2 =>
@@ -161,7 +204,8 @@ const DisplayScreen = () => {
             u1.user2('eq', currentUser.sub).user1('eq', users[index].sub),
           );
         } catch (error) {
-          Alert.alert("Error");
+          console.log(error.message)
+          Alert.alert('Error');
           return;
         }
         try {
@@ -169,7 +213,8 @@ const DisplayScreen = () => {
             u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
           );
         } catch (error) {
-          Alert.alert("Error");
+          console.log(error.message)
+          Alert.alert('Error');
           return;
         }
         console.log('creating new waiting');
@@ -180,14 +225,16 @@ const DisplayScreen = () => {
           });
           await DataStore.save(newWait);
         } catch (error) {
-          Alert.alert("Error");
+          console.log(error.message)
+          Alert.alert('Error');
           return;
         }
         setIndex((index + 1) % users.length);
         return;
       }
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     try {
@@ -195,15 +242,26 @@ const DisplayScreen = () => {
         u.user1('eq', currentUser.sub).user2('eq', users[index].sub),
       );
     } catch (error) {
-      Alert.alert("Error");
+          console.log(error.message)
+      Alert.alert('Error');
       return;
     }
     setIndex((index + 1) % users.length);
   };
   const handleSkip = () => {
+    setSkip(true);
+    setTimeout(() => {
+      setSkip(false);
+    }, 200);
     setIndex((index + 1) % users.length);
   };
-  if(loading){
+  const preLoad = () => {
+    const URL = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${
+      users[(index + 1) % users.length].image
+    }`;
+    return <Image source={{uri: URL}} style={styles.preload} />;
+  };
+  if (loading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator />
@@ -213,15 +271,37 @@ const DisplayScreen = () => {
   if (users === null || users.length === 0) {
     return (
       <View style={styles.nouserContainer}>
-        <Text style={styles.Title1}>Users Who Already Liked You</Text>
-        <Text style={styles.nouser1}>Opps..</Text>
-        <Text style={styles.nouser2}>No Users to Show</Text>
+        <Text style={styles.nouser1}>😑</Text>
+        <Text style={styles.nouser2}>No Users</Text>
       </View>
     );
   }
   return (
     <SafeAreaView style={styles.DisplayContainer}>
-      {!loading && <Card user={users[index]} />}
+      <GestureRecognizer
+        config={config}
+        onSwipeRight={handleLike}
+        onSwipeUp={handleLike}
+        onSwipeLeft={handleDislike}
+        onSwipeDown={handleDislike}>
+        {!loading && (
+          <Card
+            user={users[index]}
+            handleLike={handleLike}
+            handleDislike={handleDislike}
+          />
+        )}
+      </GestureRecognizer>
+      {!loading && preLoad()}
+      {like && (
+        <Text style={[styles.result, {backgroundColor: '#4FCC94'}]}>Like</Text>
+      )}
+      {dislike && (
+        <Text style={[styles.result, {backgroundColor: '#A65CD2'}]}>Nope</Text>
+      )}
+      {skip && (
+        <Text style={[styles.result, {backgroundColor: '#F6BE00'}]}>Skip</Text>
+      )}
       {!loading && users.length !== 0 && (
         <View style={styles.bottomNavigation}>
           <TouchableOpacity onPress={handleDislike}>
@@ -230,14 +310,6 @@ const DisplayScreen = () => {
               size={40}
               color="#A65CD2"
               style={styles.button}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSkip}>
-            <FontAwesome
-              name="refresh"
-              size={43}
-              color="#F6BE00"
-              style={styles.button1}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleLike}>
@@ -254,6 +326,24 @@ const DisplayScreen = () => {
   );
 };
 const styles = StyleSheet.create({
+  preload: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: '-100%',
+  },
+  result: {
+    position: 'absolute',
+    fontSize: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    borderRadius: 40,
+    fontWeight: '500',
+    color: 'white',
+    top: 100,
+    alignSelf: 'center',
+    elevation: 10,
+  },
   bottomNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -304,6 +394,7 @@ const styles = StyleSheet.create({
   nouser2: {
     color: '#F76C6B',
     fontSize: 40,
+    fontWeight: '800',
   },
   nouserContainer: {
     width: '100%',

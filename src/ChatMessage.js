@@ -1,4 +1,3 @@
-import {navItem} from 'aws-amplify';
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import moment from 'moment';
@@ -13,17 +12,11 @@ const ChatMessage = ({item, from, to}) => {
 
           <View style={styles.container1}>
             <Text style={styles.content1}>{item.message}</Text>
-            {/* <Text style={styles.name1}>
-              {isMyMessage() ? from.name : to.name}
-            </Text> */}
             <Text style={styles.time1}>{moment(item.createdAt).fromNow()}</Text>
           </View>
       ) : (
           <View style={styles.container2}>
             <Text style={styles.content2}>{item.message}</Text>
-            {/* <Text style={styles.name2}>
-              {isMyMessage() ? from.name : to.name}
-            </Text> */}
             <Text style={styles.time2}>{moment(item.createdAt).fromNow()}</Text>
           </View>
       )}
@@ -37,7 +30,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     elevation: 5,
     borderRadius: 20,
-    padding: 10,
+    padding: 7,
     alignSelf:'flex-end',
     margin:10,
     minWidth:'22%',
@@ -45,7 +38,7 @@ const styles = StyleSheet.create({
   },
   content1: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '500',
     alignSelf:'flex-end'
   },

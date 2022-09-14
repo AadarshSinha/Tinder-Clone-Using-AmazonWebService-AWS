@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Image, Pressable} from 'react-native';
+import {Text, View, StyleSheet, Image, Pressable,Alert} from 'react-native';
 import {Auth, DataStore} from 'aws-amplify';
 import {User, WaitlingList, Matches} from './models';
 const DisplayMatches = ({sub, setLoverSub}) => {
   const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
     const getCurrentUsers = async () => {
       try {
@@ -13,6 +14,7 @@ const DisplayMatches = ({sub, setLoverSub}) => {
         }
         setCurrentUser(dbUsers[0]);
       } catch (error) {
+        console.log(error.message)
         Alert.alert("Error");
       }
     };
@@ -20,7 +22,6 @@ const DisplayMatches = ({sub, setLoverSub}) => {
   }, []);
   const display = () => {
     const url = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${currentUser.image}`;
-    // console.log('url = ' + url);
     return <Image source={{uri: url}} style={styles.image} />;
   };
   if (currentUser === null) return;

@@ -10,6 +10,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 const LoginPage = ({setLoading}) => {
   const [number, setNumber] = useState('');
   const [password, setPassword] = useState('');
@@ -100,12 +101,13 @@ const LoginPage = ({setLoading}) => {
       }
   };
   return (
-    <View style={styles.container}>
+    <View style={styles.container} >
+      <LinearGradient colors={['#F76C6B', 'white']} style={styles.gradient}></LinearGradient>
       {screen === 'signin' && <Text style={styles.head}>Sign In</Text>}
       {screen === 'register' && <Text style={styles.head}>New User</Text>}
       {screen === 'forgot' && <Text style={styles.head}>Registered No.</Text>}
       {(screen === 'verifyNew' || screen === 'verifyOld') && (
-        <Text style={styles.head}>Verify</Text>
+        <Text style={styles.head}>Enter OTP</Text>
       )}
       {screen === 'signin' && (
         <>
@@ -223,12 +225,18 @@ const LoginPage = ({setLoading}) => {
   );
 };
 const styles = StyleSheet.create({
+  gradient:{
+    width:'100%',
+    height:'100%',
+    position:'absolute',
+  },
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F76C6B',
+    // backgroundColor: '#F76C6B',
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   textInput: {
     width: '70%',
@@ -248,7 +256,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     borderRadius: 40,
     elevation: 3,
-    backgroundColor: 'orange',
+    backgroundColor: '#F76C6B',
     marginTop: 10,
     paddingHorizontal: 20,
     elevation: 10,
@@ -271,6 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 50,
     marginBottom: 30,
     color: 'white',
+    fontWeight:'500',
   },
 });
 export default LoginPage;

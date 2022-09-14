@@ -1,57 +1,50 @@
-import {S3Image} from 'aws-amplify-react-native/dist/Storage';
 import React, {useState} from 'react';
 import {View, Image, StyleSheet, Text} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-
 export default function Card({user}) {
   const [bio, setBio] = useState(false);
+
   const diasplayImage = () => {
-    const URL= `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${user.image}`
-    console.log("URL = ",URL)
-    return (
-      <Image
-        source={{
-          uri:URL,
-        }}
-        style={styles.photo}
-      />
-    );
+    const URL = `https://lpu549be2fd8f0f4ba1b6d780e258bd43bc71012-staging.s3.ap-south-1.amazonaws.com/public/${user.image}`;
+
+    return <Image source={{uri: URL}} style={styles.photo} />;
   };
   return (
-    <View style={styles.CardContainer}>
-      <SkeletonPlaceholder style={styles.skeleton}>
-        <View style={styles.imageContainer}></View>
-      </SkeletonPlaceholder>
-      {diasplayImage()}
-      <View style={styles.textContainer}>
-        <View style={styles.textRow}>
-          <Text style={styles.abc}>
-            <Text style={[styles.textPrimary, styles.textShadow]}>
-              {user.name}
+      <View style={styles.CardContainer}>
+        <SkeletonPlaceholder style={styles.skeleton}>
+          <View style={styles.imageContainer}></View>
+        </SkeletonPlaceholder>
+        {diasplayImage()}
+        <View style={styles.textContainer}>
+          <View style={styles.textRow}>
+            <Text style={styles.abc}>
+              <Text style={[styles.textPrimary, styles.textShadow]}>
+                {user.name}
+              </Text>
             </Text>
-          </Text>
-          <Text style={[styles.textSecondary, styles.textShadow]}>
-            {' '}
-            {user.age}{' '}
-          </Text>
-          <FontAwesome5
-            name="info-circle"
-            size={20}
-            color="white"
-            onPress={() => {
-              setBio(!bio);
-            }}></FontAwesome5>
-        </View>
-        {bio && (
-          <View style={styles.BioRow}>
             <Text style={[styles.textSecondary, styles.textShadow]}>
-              {user.bio}
+              {'  '}
+              {user.age}
+              {'  '}
             </Text>
+            <FontAwesome5
+              name="info-circle"
+              size={20}
+              color="white"
+              onPress={() => {
+                setBio(!bio);
+              }}></FontAwesome5>
           </View>
-        )}
+          {bio && (
+            <View style={styles.BioRow}>
+              <Text style={[styles.textSecondary, styles.textShadow]}>
+                {user.bio}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
   );
 }
 
@@ -63,14 +56,13 @@ const styles = StyleSheet.create({
     height: '99%',
     resizeMode: 'cover',
     borderRadius: 20,
-    minWidth:'94%',
-    top:10,
+    minWidth: '94%',
+    top: 10,
   },
   abc: {
     maxWidth: '90%',
   },
   CardContainer: {
-    // backgroundColor:'red',
     width: '100%',
     height: '100%',
     justifyContent: 'center',
@@ -88,12 +80,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     left: '5%',
-    maxWidth: '90%',
+    maxWidth: 320,
     paddingBottom: 15,
+    maxWidth: 350,
   },
   textRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    maxWidth: 350,
   },
   BioRow: {
     flexDirection: 'row',
