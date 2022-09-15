@@ -1,7 +1,8 @@
 type Feedback @model @auth(rules: [{allow: public}]) {
   id: ID!
   type: String!
-  message: String!
+  message: String
+  sub: String
 }
 
 type Block @model @auth(rules: [{allow: public}]) {

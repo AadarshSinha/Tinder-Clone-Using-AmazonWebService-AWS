@@ -103,9 +103,9 @@ const LoginPage = ({setLoading}) => {
   return (
     <View style={styles.container} >
       <LinearGradient colors={['#F76C6B', 'white']} style={styles.gradient}></LinearGradient>
-      {screen === 'signin' && <Text style={styles.head}>Sign In</Text>}
-      {screen === 'register' && <Text style={styles.head}>New User</Text>}
-      {screen === 'forgot' && <Text style={styles.head}>Registered No.</Text>}
+      {screen === 'signin' && <Text style={styles.head}>Login</Text>}
+      {screen === 'register' && <Text style={styles.head}>Register</Text>}
+      {screen === 'forgot' && <Text style={styles.head}>Registered Email</Text>}
       {(screen === 'verifyNew' || screen === 'verifyOld') && (
         <Text style={styles.head}>Enter OTP</Text>
       )}

@@ -17,9 +17,11 @@ const FeedbackForm = ({setIsFeedback}) => {
   const submit = async () => {
     if(msg===null || msg==='')return
     try {
+      const authUser = await Auth.currentAuthenticatedUser();
     const newFeed = new Feedback({
         type:type,
-        message:msg
+        message:msg,
+        sub:authUser.attributes.sub,
       });
       await DataStore.save(newFeed);
       

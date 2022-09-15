@@ -21,7 +21,14 @@ export const schema = {
                     "name": "message",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "sub": {
+                    "name": "sub",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "createdAt": {
@@ -507,7 +514,7 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "b058a1b5030a6f536195ba5f4a93adb0"
+    "version": "56cd27f005847e9ce96bc68e3246190b"
 };
 export const onCreateChatData = /* GraphQL */ `
   subscription onCreateChatData {

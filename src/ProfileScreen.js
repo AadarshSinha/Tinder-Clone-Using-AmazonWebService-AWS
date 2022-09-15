@@ -40,7 +40,9 @@ const ProfileScreen = ({setIsNew, setScreen}) => {
 
   useEffect(() => {
     const backAction = () => {
-      setScreen('display');
+      
+      if(user===null || user.length==0) BackHandler.exitApp()
+      else setScreen('display');
       return true;
     };
     const backHandler = BackHandler.addEventListener(

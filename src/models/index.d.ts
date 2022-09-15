@@ -35,7 +35,8 @@ type UserMetaData = {
 export declare class Feedback {
   readonly id: string;
   readonly type: string;
-  readonly message: string;
+  readonly message?: string | null;
+  readonly sub?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   constructor(init: ModelInit<Feedback, FeedbackMetaData>);

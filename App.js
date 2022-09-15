@@ -76,7 +76,6 @@ const style = StyleSheet.create({
 });
 export default App;
 
-
 // export const onCreateChatData = /* GraphQL */ `
 //   subscription onCreateChatData {
 //     onCreateChatData {
@@ -97,9 +96,20 @@ export default App;
 //     }
 //   }
 // `;
+// export const onCreateChatUsers = /* GraphQL */ `
+//   subscription onCreateChatUsers {
+//     onCreateChatUsers {
+//       id
+//       from
+//       to
+//       message
+//     }
+//   }
+// `;
 // export const onCreateBlock = /* GraphQL */ `
 //   subscription onCreateBlock {
 //     onCreateBlock {
+//       id
 //       by
 //       to
 //     }
@@ -108,6 +118,7 @@ export default App;
 // export const onDeleteBlock = /* GraphQL */ `
 //   subscription onDeleteBlock {
 //     onDeleteBlock {
+//       id
 //       by
 //       to
 //     }
