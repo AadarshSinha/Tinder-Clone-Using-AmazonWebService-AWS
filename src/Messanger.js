@@ -309,6 +309,7 @@ const Messanger = ({setIsChatting, setLoverSub, from, to}) => {
         )}
         inverted
         style={styles.content}
+        // onPress={()=>{setDrop(false)}}
       />
 
       {!blockHua && !blockKiya ? (

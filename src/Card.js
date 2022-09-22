@@ -75,6 +75,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 20,
     position: 'absolute',
+    resizeMode: 'cover',
+    //contain stretch cover
   },
   textContainer: {
     position: 'absolute',

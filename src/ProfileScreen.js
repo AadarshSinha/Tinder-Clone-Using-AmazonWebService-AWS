@@ -26,7 +26,7 @@ import FeedbackForm from './FeedbackForm';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import Card from './Card';
 
-const ProfileScreen = ({setIsNew, setScreen}) => {
+const ProfileScreen = ({setIsNew, setScreen,isNew}) => {
   const [Name, setName] = useState('');
   const [Age, setAge] = useState('');
   const [Bio, setBio] = useState('');
@@ -40,9 +40,10 @@ const ProfileScreen = ({setIsNew, setScreen}) => {
 
   useEffect(() => {
     const backAction = () => {
-      
-      if(user===null || user.length==0) BackHandler.exitApp()
-      else setScreen('display');
+      if(isNew) BackHandler.exitApp()
+      else {
+        setScreen('display');
+      }
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -64,6 +65,7 @@ const ProfileScreen = ({setIsNew, setScreen}) => {
           setUser([]);
           return;
         }
+        console.log('This is a old user');
         const dbUser = dbUsers[0];
         setUser(dbUser);
         setName(dbUser.name);
@@ -159,6 +161,7 @@ const ProfileScreen = ({setIsNew, setScreen}) => {
         await DataStore.save(newUser);
         setUser(newUser);
         setIsNew(false);
+        setIsLoaded(true);
         Alert.alert('Updated Successfully');
         setIsUpdating(false);
         console.log('User added successful');
@@ -303,12 +306,15 @@ const ProfileScreen = ({setIsNew, setScreen}) => {
 };
 
 const styles = StyleSheet.create({
+
   card1: {
     position: 'absolute',
     right: 30,
     top: 95,
-    padding: 5,
-
+    paddingHorizontal: 2,
+    elevation:20,
+    backgroundColor:'white',
+    borderRadius:10,
   },
   card: {
     position: 'absolute',

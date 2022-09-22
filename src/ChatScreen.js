@@ -164,9 +164,9 @@ const styles = StyleSheet.create({
   nomatch:{
     color:'grey',
     marginLeft:20,
-    fontSize:20,
+    fontSize:16,
     top:40,
-    maxWidth:300,
+    maxWidth:350,
     position:'absolute',
     // backgroundColor:'red',
     alignContent:'center',

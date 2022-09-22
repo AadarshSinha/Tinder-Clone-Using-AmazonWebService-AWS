@@ -124,3 +124,5 @@ export default App;
 //     }
 //   }
 // `;
+// ./gradlew bundleRelease
+// npx react-native run-android --variant=release
