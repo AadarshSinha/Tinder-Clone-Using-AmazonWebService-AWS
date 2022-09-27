@@ -161,7 +161,6 @@ const ProfileScreen = ({setIsNew, setScreen,isNew}) => {
         await DataStore.save(newUser);
         setUser(newUser);
         setIsNew(false);
-        setIsLoaded(true);
         Alert.alert('Updated Successfully');
         setIsUpdating(false);
         console.log('User added successful');
